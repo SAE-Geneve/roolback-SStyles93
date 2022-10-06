@@ -27,7 +27,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         if (!entityManager_.HasComponent(playerEntity,
             static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)))
             continue;
-        auto playerBody = physicsManager_.GetBody(playerEntity);
+        auto playerBody = physicsManager_.GetRigidbody(playerEntity);
         auto playerCharacter = GetComponent(playerEntity);
         const auto input = playerCharacter.input;
 
@@ -48,7 +48,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
 
         playerBody.velocity += acceleration * dt.asSeconds();
 
-        physicsManager_.SetBody(playerEntity, playerBody);
+        physicsManager_.SetRigidbody(playerEntity, playerBody);
 
         if (playerCharacter.invincibilityTime > 0.0f)
         {

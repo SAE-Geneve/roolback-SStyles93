@@ -83,10 +83,10 @@ void RollbackManager::SimulateToCurrentFrame()
     for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
     {
         if (!entityManager_.HasComponent(entity,
-            static_cast<core::EntityMask>(core::ComponentType::BODY2D) |
+            static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
             static_cast<core::EntityMask>(core::ComponentType::TRANSFORM)))
             continue;
-        const auto& body = currentPhysicsManager_.GetBody(entity);
+        const auto& body = currentPhysicsManager_.GetRigidbody(entity);
         currentTransformManager_.SetPosition(entity, body.position);
         currentTransformManager_.SetRotation(entity, body.rotation);
     }
@@ -237,7 +237,7 @@ PhysicsState RollbackManager::GetValidatePhysicsState(PlayerNumber playerNumber)
 {
     PhysicsState state = 0;
     const core::Entity playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
-    const auto& playerBody = lastValidatePhysicsManager_.GetBody(playerEntity);
+    const auto& playerBody = lastValidatePhysicsManager_.GetRigidbody(playerEntity);
 
     const auto pos = playerBody.position;
     const auto* posPtr = reinterpret_cast<const PhysicsState*>(&pos);
@@ -277,11 +277,11 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
 #ifdef TRACY_ENABLE
     ZoneScoped;
 #endif
-    Body playerBody;
+    Rigidbody playerBody;
     playerBody.position = position;
     playerBody.rotation = rotation;
-    Box playerBox;
-    playerBox.extends = core::Vec2f::one() * 0.25f;
+    SphereCollider playerSphere;
+    playerSphere.radius = 0.25f;
 
     PlayerCharacter playerCharacter;
     playerCharacter.playerNumber = playerNumber;
@@ -289,18 +289,18 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
     currentPlayerManager_.AddComponent(entity);
     currentPlayerManager_.SetComponent(entity, playerCharacter);
 
-    currentPhysicsManager_.AddBody(entity);
-    currentPhysicsManager_.SetBody(entity, playerBody);
-    currentPhysicsManager_.AddBox(entity);
-    currentPhysicsManager_.SetBox(entity, playerBox);
+    currentPhysicsManager_.AddRigidbody(entity);
+    currentPhysicsManager_.SetRigidbody(entity, playerBody);
+    currentPhysicsManager_.AddSphere(entity);
+    currentPhysicsManager_.SetSphere(entity, playerSphere);
 
     lastValidatePlayerManager_.AddComponent(entity);
     lastValidatePlayerManager_.SetComponent(entity, playerCharacter);
 
-    lastValidatePhysicsManager_.AddBody(entity);
-    lastValidatePhysicsManager_.SetBody(entity, playerBody);
-    lastValidatePhysicsManager_.AddBox(entity);
-    lastValidatePhysicsManager_.SetBox(entity, playerBox);
+    lastValidatePhysicsManager_.AddRigidbody(entity);
+    lastValidatePhysicsManager_.SetRigidbody(entity, playerBody);
+    lastValidatePhysicsManager_.AddSphere(entity);
+    lastValidatePhysicsManager_.SetSphere(entity, playerSphere);
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
@@ -354,19 +354,19 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
 {
     createdEntities_.push_back({ entity, testedFrame_ });
 
-    Body bulletBody;
+    Rigidbody bulletBody;
     bulletBody.position = position;
     bulletBody.velocity = velocity;
-    Box bulletBox;
-    bulletBox.extends = core::Vec2f::one() * BULLET_SCALE * 0.5f;
+    SphereCollider bulletSphere;
+    bulletSphere.radius = 0.5f * BULLET_SCALE;
 
     currentBulletManager_.AddComponent(entity);
     currentBulletManager_.SetComponent(entity, { BULLET_PERIOD, playerNumber });
 
-    currentPhysicsManager_.AddBody(entity);
-    currentPhysicsManager_.SetBody(entity, bulletBody);
-    currentPhysicsManager_.AddBox(entity);
-    currentPhysicsManager_.SetBox(entity, bulletBox);
+    currentPhysicsManager_.AddRigidbody(entity);
+    currentPhysicsManager_.SetRigidbody(entity, bulletBody);
+    currentPhysicsManager_.AddSphere(entity);
+    currentPhysicsManager_.SetSphere(entity, bulletSphere);
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
