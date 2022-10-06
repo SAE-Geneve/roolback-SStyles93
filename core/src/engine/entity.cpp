@@ -8,7 +8,7 @@ namespace core
 {
 EntityManager::EntityManager()
 {
-    entityMasks_.resize(entityInitNmb, INVALID_ENTITY_MASK);
+    entityMasks_.resize(ENTITY_INIT_NMB, INVALID_ENTITY_MASK);
 }
 
 EntityManager::EntityManager(std::size_t reservedSize)

@@ -21,7 +21,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
 #ifdef TRACY_ENABLE
     ZoneScoped;
 #endif
-    for (PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
+    for (PlayerNumber playerNumber = 0; playerNumber < MAX_PLAYER_NMB; playerNumber++)
     {
         const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
         if (!entityManager_.HasComponent(playerEntity,
@@ -36,7 +36,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         const bool up = input & PlayerInputEnum::PlayerInput::UP;
         const bool down = input & PlayerInputEnum::PlayerInput::DOWN;
 
-        const auto angularVelocity = ((left ? -1.0f : 0.0f) + (right ? 1.0f : 0.0f)) * playerAngularSpeed;
+        const auto angularVelocity = ((left ? -1.0f : 0.0f) + (right ? 1.0f : 0.0f)) * PLAYER_ANGULAR_SPEED;
 
         playerBody.angularVelocity = angularVelocity;
 
@@ -56,20 +56,20 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
             SetComponent(playerEntity, playerCharacter);
         }
         //Check if playerCharacter cannot shoot, and increase shootingTime
-        if (playerCharacter.shootingTime < playerShootingPeriod)
+        if (playerCharacter.shootingTime < PLAYER_SHOOTING_PERIOD)
         {
             playerCharacter.shootingTime += dt.asSeconds();
             SetComponent(playerEntity, playerCharacter);
         }
         //Shooting mechanism
-        if (playerCharacter.shootingTime >= playerShootingPeriod)
+        if (playerCharacter.shootingTime >= PLAYER_SHOOTING_PERIOD)
         {
             if (input & PlayerInputEnum::PlayerInput::SHOOT)
             {
                 const auto currentPlayerSpeed = playerBody.velocity.GetMagnitude();
                 const auto bulletVelocity = dir *
                     ((core::Vec2f::Dot(playerBody.velocity, dir) > 0.0f ? currentPlayerSpeed : 0.0f)
-                        + bulletSpeed);
+                        + BULLET_SPEED);
                 const auto bulletPosition = playerBody.position + dir * 0.5f + playerBody.velocity * dt.asSeconds();
                 gameManager_.SpawnBullet(playerCharacter.playerNumber,
                     bulletPosition,

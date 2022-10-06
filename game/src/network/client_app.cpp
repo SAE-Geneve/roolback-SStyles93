@@ -15,7 +15,7 @@ void ClientApp::Begin()
 #ifdef TRACY_ENABLE
     ZoneScoped;
 #endif
-    windowSize_ = core::windowSize;
+    windowSize_ = core::WINDOW_SIZE;
     client_.SetWindowSize(windowSize_);
     client_.Begin();
 }

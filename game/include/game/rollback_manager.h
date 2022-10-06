@@ -58,7 +58,7 @@ public:
      * \param newValidatedFrame is the new frame that is validated
      * \param serverPhysicsState is the physics state given by the server through a packet
      */
-    void ConfirmFrame(Frame newValidatedFrame, const std::array<PhysicsState, maxPlayerNmb>& serverPhysicsState);
+    void ConfirmFrame(Frame newValidatedFrame, const std::array<PhysicsState, MAX_PLAYER_NMB>& serverPhysicsState);
     [[nodiscard]] PhysicsState GetValidatePhysicsState(PlayerNumber playerNumber) const;
     [[nodiscard]] Frame GetLastValidateFrame() const { return lastValidateFrame_; }
     [[nodiscard]] Frame GetLastReceivedFrame(PlayerNumber playerNumber) const { return lastReceivedFrame_[playerNumber]; }
@@ -75,7 +75,7 @@ public:
     void DestroyEntity(core::Entity entity);
 
     void OnTrigger(core::Entity entity1, core::Entity entity2) override;
-        [[nodiscard]] const std::array<PlayerInput, windowBufferSize>& GetInputs(PlayerNumber playerNumber) const
+        [[nodiscard]] const std::array<PlayerInput, WINDOW_BUFFER_SIZE>& GetInputs(PlayerNumber playerNumber) const
     {
         return inputs_[playerNumber];
     }
@@ -113,8 +113,8 @@ private:
      */
     Frame testedFrame_ = 0; 
 
-    std::array<std::uint32_t, maxPlayerNmb> lastReceivedFrame_{};
-    std::array<std::array<PlayerInput, windowBufferSize>, maxPlayerNmb> inputs_{};
+    std::array<std::uint32_t, MAX_PLAYER_NMB> lastReceivedFrame_{};
+    std::array<std::array<PlayerInput, WINDOW_BUFFER_SIZE>, MAX_PLAYER_NMB> inputs_{};
     /**
      * \brief Array containing all the created entities in the window between the confirm frame and the current frame
      * to destroy them when rollbacking.

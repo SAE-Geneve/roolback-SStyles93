@@ -72,7 +72,7 @@ core::Entity GameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec2f pos
 
     transformManager_.AddComponent(entity);
     transformManager_.SetPosition(entity, position);
-    transformManager_.SetScale(entity, core::Vec2f::one() * bulletScale);
+    transformManager_.SetScale(entity, core::Vec2f::one() * BULLET_SCALE);
     transformManager_.SetRotation(entity, core::Degree(0.0f));
     rollbackManager_.SpawnBullet(playerNumber, entity, position, velocity);
     return entity;
@@ -158,19 +158,19 @@ void ClientGameManager::Update(sf::Time dt)
                 /*
                 if (player.invincibilityTime > 0.0f)
                 {
-                    //auto leftV = std::fmod(player.invincibilityTime, invincibilityFlashPeriod);
-                    //auto rightV = invincibilityFlashPeriod / 2.0f;
+                    //auto leftV = std::fmod(player.invincibilityTime, INVINCIBILITY_FLASH_PERIOD);
+                    //auto rightV = INVINCIBILITY_FLASH_PERIOD / 2.0f;
                     //core::LogDebug(fmt::format("Comparing {} and {} with time: {}", leftV, rightV, player.invincibilityTime));
                 }
                 */
                 if (player.invincibilityTime > 0.0f &&
-                    std::fmod(player.invincibilityTime, invincibilityFlashPeriod) > invincibilityFlashPeriod / 2.0f)
+                    std::fmod(player.invincibilityTime, INVINCIBILITY_FLASH_PERIOD) > INVINCIBILITY_FLASH_PERIOD / 2.0f)
                 {
                     spriteManager_.SetColor(entity, sf::Color::Black);
                 }
                 else
                 {
-                    spriteManager_.SetColor(entity, playerColors[player.playerNumber]);
+                    spriteManager_.SetColor(entity, PLAYER_COLORS[player.playerNumber]);
                 }
             }
 
@@ -183,10 +183,10 @@ void ClientGameManager::Update(sf::Time dt)
         }
     }
     fixedTimer_ += dt.asSeconds();
-    while (fixedTimer_ > fixedPeriod)
+    while (fixedTimer_ > FIXED_PERIOD)
     {
         FixedUpdate();
-        fixedTimer_ -= fixedPeriod;
+        fixedTimer_ -= FIXED_PERIOD;
 
     }
 
@@ -293,7 +293,7 @@ void ClientGameManager::Draw(sf::RenderTarget& target)
     {
         std::string health;
         const auto& playerManager = rollbackManager_.GetPlayerCharacterManager();
-        for (PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
+        for (PlayerNumber playerNumber = 0; playerNumber < MAX_PLAYER_NMB; playerNumber++)
         {
             const auto playerEntity = GetEntityFromPlayerNumber(playerNumber);
             if (playerEntity == core::INVALID_ENTITY)
@@ -325,7 +325,7 @@ void ClientGameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f posit
     spriteManager_.AddComponent(entity);
     spriteManager_.SetTexture(entity, shipTexture_);
     spriteManager_.SetOrigin(entity, sf::Vector2f(shipTexture_.getSize()) / 2.0f);
-    spriteManager_.SetColor(entity, playerColors[playerNumber]);
+    spriteManager_.SetColor(entity, PLAYER_COLORS[playerNumber]);
 
 }
 
@@ -336,7 +336,7 @@ core::Entity ClientGameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec
     spriteManager_.AddComponent(entity);
     spriteManager_.SetTexture(entity, bulletTexture_);
     spriteManager_.SetOrigin(entity, sf::Vector2f(bulletTexture_.getSize()) / 2.0f);
-    spriteManager_.SetColor(entity, playerColors[playerNumber]);
+    spriteManager_.SetColor(entity, PLAYER_COLORS[playerNumber]);
 
     return entity;
 }
@@ -434,14 +434,14 @@ void ClientGameManager::DrawImGui()
 }
 
 void ClientGameManager::ConfirmValidateFrame(Frame newValidateFrame,
-    const std::array<PhysicsState, maxPlayerNmb>& physicsStates)
+    const std::array<PhysicsState, MAX_PLAYER_NMB>& physicsStates)
 {
     if (newValidateFrame < rollbackManager_.GetLastValidateFrame())
     {
         core::LogWarning(fmt::format("New validate frame is too old"));
         return;
     }
-    for (PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
+    for (PlayerNumber playerNumber = 0; playerNumber < MAX_PLAYER_NMB; playerNumber++)
     {
         if (rollbackManager_.GetLastReceivedFrame(playerNumber) < newValidateFrame)
         {
@@ -474,10 +474,10 @@ void ClientGameManager::UpdateCameraView()
     }
 
     cameraView_ = originalView_;
-    const sf::Vector2f extends{ cameraView_.getSize() / 2.0f / core::pixelPerMeter };
+    const sf::Vector2f extends{ cameraView_.getSize() / 2.0f / core::PIXEL_PER_METER };
     float currentZoom = 1.0f;
     constexpr float margin = 1.0f;
-    for (PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
+    for (PlayerNumber playerNumber = 0; playerNumber < MAX_PLAYER_NMB; playerNumber++)
     {
         const auto playerEntity = GetEntityFromPlayerNumber(playerNumber);
         if (playerEntity == core::INVALID_ENTITY)

@@ -75,7 +75,7 @@ void Engine::Init()
 #ifdef TRACY_ENABLE
     ZoneScoped;
 #endif
-    window_ = std::make_unique<sf::RenderWindow>(sf::VideoMode(windowSize.x, windowSize.y), "Rollback Game");
+    window_ = std::make_unique<sf::RenderWindow>(sf::VideoMode(WINDOW_SIZE.x, WINDOW_SIZE.y), "Rollback Game");
     const bool status = ImGui::SFML::Init(*window_);
     if(!status)
     {

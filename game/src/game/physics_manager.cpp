@@ -132,11 +132,11 @@ void PhysicsManager::Draw(sf::RenderTarget& renderTarget)
         rectShape.setOutlineColor(core::Color::green());
         rectShape.setOutlineThickness(2.0f);
         const auto position = body.position;
-        rectShape.setOrigin({ extends.x * core::pixelPerMeter, extends.y * core::pixelPerMeter });
+        rectShape.setOrigin({ extends.x * core::PIXEL_PER_METER, extends.y * core::PIXEL_PER_METER });
         rectShape.setPosition(
-            position.x * core::pixelPerMeter + center_.x,
-            windowSize_.y - (position.y * core::pixelPerMeter + center_.y));
-        rectShape.setSize({ extends.x * 2.0f * core::pixelPerMeter, extends.y * 2.0f * core::pixelPerMeter });
+            position.x * core::PIXEL_PER_METER + center_.x,
+            windowSize_.y - (position.y * core::PIXEL_PER_METER + center_.y));
+        rectShape.setSize({ extends.x * 2.0f * core::PIXEL_PER_METER, extends.y * 2.0f * core::PIXEL_PER_METER });
         renderTarget.draw(rectShape);
     }
 }

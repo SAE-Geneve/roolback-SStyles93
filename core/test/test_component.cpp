@@ -70,11 +70,11 @@ TEST(Component, InternalArrayOverflow)
     core::EntityManager entityManager;
     SimpleComponentManager componentManager(entityManager);
 
-    for (std::size_t i = 0; i < core::entityInitNmb; i++)
+    for (std::size_t i = 0; i < core::ENTITY_INIT_NMB; i++)
     {
         entityManager.CreateEntity();
     }
     const auto entity = entityManager.CreateEntity();
     componentManager.AddComponent(entity);
-    EXPECT_LT(core::entityInitNmb, componentManager.GetAllComponents().size());
+    EXPECT_LT(core::ENTITY_INIT_NMB, componentManager.GetAllComponents().size());
 }

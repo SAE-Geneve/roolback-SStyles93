@@ -23,8 +23,8 @@ void SpriteManager::Draw(sf::RenderTarget& window)
             {
                 const auto position = transformManager_.GetPosition(entity);
                 components_[entity].setPosition(
-                    position.x * pixelPerMeter + center_.x,
-                    windowSize_.y - (position.y * pixelPerMeter + center_.y));
+                    position.x * PIXEL_PER_METER + center_.x,
+                    windowSize_.y - (position.y * PIXEL_PER_METER + center_.y));
             }
             if (entityManager_.HasComponent(entity, static_cast<Component>(ComponentType::SCALE)))
             {

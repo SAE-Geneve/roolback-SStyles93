@@ -135,7 +135,7 @@ void SimulationClient::ReceivePacket(const Packet* packet)
             auto* statePtr = reinterpret_cast<std::uint8_t*>(state.serverStates.data());
             statePtr[i] = validateStatePacket->physicsState[i];
         }
-        for (PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
+        for (PlayerNumber playerNumber = 0; playerNumber < MAX_PLAYER_NMB; playerNumber++)
         {
             state.localStates[playerNumber] = gameManager_.GetRollbackManager().GetValidatePhysicsState(playerNumber);
         }

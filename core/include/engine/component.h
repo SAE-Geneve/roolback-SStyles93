@@ -34,7 +34,7 @@ class ComponentManager
 public:
     ComponentManager(EntityManager& entityManager) : entityManager_(entityManager)
     {
-        components_.resize(entityInitNmb);
+        components_.resize(ENTITY_INIT_NMB);
     }
     virtual ~ComponentManager() = default;
 

@@ -61,7 +61,7 @@ void RollbackManager::SimulateToCurrentFrame()
     {
         testedFrame_ = frame;
         //Copy player inputs to player manager
-        for (PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
+        for (PlayerNumber playerNumber = 0; playerNumber < MAX_PLAYER_NMB; playerNumber++)
         {
             const auto playerInput = GetInputAtFrame(playerNumber, frame);
             const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
@@ -75,9 +75,9 @@ void RollbackManager::SimulateToCurrentFrame()
             currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
         }
         //Simulate one frame of the game
-        currentBulletManager_.FixedUpdate(sf::seconds(fixedPeriod));
-        currentPlayerManager_.FixedUpdate(sf::seconds(fixedPeriod));
-        currentPhysicsManager_.FixedUpdate(sf::seconds(fixedPeriod));
+        currentBulletManager_.FixedUpdate(sf::seconds(FIXED_PERIOD));
+        currentPlayerManager_.FixedUpdate(sf::seconds(FIXED_PERIOD));
+        currentPhysicsManager_.FixedUpdate(sf::seconds(FIXED_PERIOD));
     }
     //Copy the physics states to the transforms
     for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
@@ -146,7 +146,7 @@ void RollbackManager::ValidateFrame(Frame newValidateFrame)
 #endif
     const auto lastValidateFrame = gameManager_.GetLastValidateFrame();
     //We check that we got all the inputs
-    for (PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
+    for (PlayerNumber playerNumber = 0; playerNumber < MAX_PLAYER_NMB; playerNumber++)
     {
         if (GetLastReceivedFrame(playerNumber) < newValidateFrame)
         {
@@ -184,7 +184,7 @@ void RollbackManager::ValidateFrame(Frame newValidateFrame)
     {
         testedFrame_ = frame;
         //Copy the players inputs into the player manager
-        for (PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
+        for (PlayerNumber playerNumber = 0; playerNumber < MAX_PLAYER_NMB; playerNumber++)
         {
             const auto playerInput = GetInputAtFrame(playerNumber, frame);
             const auto playerEntity = gameManager_.GetEntityFromPlayerNumber(playerNumber);
@@ -193,9 +193,9 @@ void RollbackManager::ValidateFrame(Frame newValidateFrame)
             currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
         }
         //We simulate one frame
-        currentBulletManager_.FixedUpdate(sf::seconds(fixedPeriod));
-        currentPlayerManager_.FixedUpdate(sf::seconds(fixedPeriod));
-        currentPhysicsManager_.FixedUpdate(sf::seconds(fixedPeriod));
+        currentBulletManager_.FixedUpdate(sf::seconds(FIXED_PERIOD));
+        currentPlayerManager_.FixedUpdate(sf::seconds(FIXED_PERIOD));
+        currentPhysicsManager_.FixedUpdate(sf::seconds(FIXED_PERIOD));
     }
     //Definitely remove DESTROY entities
     for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
@@ -212,14 +212,14 @@ void RollbackManager::ValidateFrame(Frame newValidateFrame)
     lastValidateFrame_ = newValidateFrame;
     createdEntities_.clear();
 }
-void RollbackManager::ConfirmFrame(Frame newValidateFrame, const std::array<PhysicsState, maxPlayerNmb>& serverPhysicsState)
+void RollbackManager::ConfirmFrame(Frame newValidateFrame, const std::array<PhysicsState, MAX_PLAYER_NMB>& serverPhysicsState)
 {
 
 #ifdef TRACY_ENABLE
     ZoneScoped;
 #endif
     ValidateFrame(newValidateFrame);
-    for (PlayerNumber playerNumber = 0; playerNumber < maxPlayerNmb; playerNumber++)
+    for (PlayerNumber playerNumber = 0; playerNumber < MAX_PLAYER_NMB; playerNumber++)
     {
         const PhysicsState lastPhysicsState = GetValidatePhysicsState(playerNumber);
         if (serverPhysicsState[playerNumber] != lastPhysicsState)
@@ -328,7 +328,7 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
             {
                 core::LogDebug(fmt::format("Player {} is hit by bullet", playerCharacter.playerNumber));
                 --playerCharacter.health;
-                playerCharacter.invincibilityTime = playerInvincibilityPeriod;
+                playerCharacter.invincibilityTime = PLAYER_INVINCIBILITY_PERIOD;
             }
             currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
         }
@@ -358,10 +358,10 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
     bulletBody.position = position;
     bulletBody.velocity = velocity;
     Box bulletBox;
-    bulletBox.extends = core::Vec2f::one() * bulletScale * 0.5f;
+    bulletBox.extends = core::Vec2f::one() * BULLET_SCALE * 0.5f;
 
     currentBulletManager_.AddComponent(entity);
-    currentBulletManager_.SetComponent(entity, { bulletPeriod, playerNumber });
+    currentBulletManager_.SetComponent(entity, { BULLET_PERIOD, playerNumber });
 
     currentPhysicsManager_.AddBody(entity);
     currentPhysicsManager_.SetBody(entity, bulletBody);
@@ -370,7 +370,7 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
-    currentTransformManager_.SetScale(entity, core::Vec2f::one() * bulletScale);
+    currentTransformManager_.SetScale(entity, core::Vec2f::one() * BULLET_SCALE);
     currentTransformManager_.SetRotation(entity, core::Degree(0.0f));
 }
 

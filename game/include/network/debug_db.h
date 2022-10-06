@@ -16,8 +16,8 @@ namespace game
 
 struct DbPhysicsState
 {
-    std::array<PhysicsState, maxPlayerNmb> serverStates{};
-    std::array<PhysicsState, maxPlayerNmb> localStates{};
+    std::array<PhysicsState, MAX_PLAYER_NMB> serverStates{};
+    std::array<PhysicsState, MAX_PLAYER_NMB> localStates{};
     Frame lastLocalValidateFrame{};
     Frame validateFrame{};
 };

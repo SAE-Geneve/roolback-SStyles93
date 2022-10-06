@@ -49,7 +49,7 @@ protected:
     core::EntityManager entityManager_;
     core::TransformManager transformManager_;
     RollbackManager rollbackManager_;
-    std::array<core::Entity, maxPlayerNmb> playerEntityMap_{};
+    std::array<core::Entity, MAX_PLAYER_NMB> playerEntityMap_{};
     Frame currentFrame_ = 0;
     PlayerNumber winner_ = INVALID_PLAYER;
 };
@@ -86,7 +86,7 @@ public:
     void FixedUpdate();
     void SetPlayerInput(PlayerNumber playerNumber, PlayerInput playerInput, std::uint32_t inputFrame) override;
     void DrawImGui() override;
-    void ConfirmValidateFrame(Frame newValidateFrame, const std::array<PhysicsState, maxPlayerNmb>& physicsStates);
+    void ConfirmValidateFrame(Frame newValidateFrame, const std::array<PhysicsState, MAX_PLAYER_NMB>& physicsStates);
     [[nodiscard]] PlayerNumber GetPlayerNumber() const { return clientPlayer_; }
     void WinGame(PlayerNumber winner) override;
     [[nodiscard]] std::uint32_t GetState() const { return state_; }

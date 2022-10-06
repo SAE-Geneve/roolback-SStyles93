@@ -14,8 +14,8 @@ void StarBackground::Init()
         auto& vertex = vertexArray_[i];
         vertex.color = sf::Color::White;
         vertex.position = sf::Vector2f(
-            core::RandomRange(-50.0f, 50.0f) * core::pixelPerMeter,
-            core::RandomRange(-50.0f, 50.0f) * core::pixelPerMeter);
+            core::RandomRange(-50.0f, 50.0f) * core::PIXEL_PER_METER,
+            core::RandomRange(-50.0f, 50.0f) * core::PIXEL_PER_METER);
     }
 }
 

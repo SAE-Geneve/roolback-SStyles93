@@ -34,37 +34,37 @@ using Frame = std::uint32_t;
 /**
  * \brief mmaxPlayerNmb is a integer constant that defines the maximum number of player per game
  */
-constexpr std::uint32_t maxPlayerNmb = 2;
-constexpr short playerHealth = 5;
-constexpr float playerSpeed = 1.0f;
-constexpr core::Degree playerAngularSpeed = core::Degree(90.0f);
-constexpr float playerShootingPeriod = 0.3f;
-constexpr float bulletSpeed = 2.0f;
-constexpr float bulletScale = 0.1f;
-constexpr float bulletPeriod = 3.0f;
-constexpr float playerInvincibilityPeriod = 1.5f;
-constexpr float invincibilityFlashPeriod = 0.5f;
+constexpr std::uint32_t MAX_PLAYER_NMB = 2;
+constexpr short PLAYER_HEALTH = 5;
+constexpr float PLAYER_SPEED = 1.0f;
+constexpr core::Degree PLAYER_ANGULAR_SPEED = core::Degree(90.0f);
+constexpr float PLAYER_SHOOTING_PERIOD = 0.3f;
+constexpr float BULLET_SPEED = 2.0f;
+constexpr float BULLET_SCALE = 0.1f;
+constexpr float BULLET_PERIOD = 3.0f;
+constexpr float PLAYER_INVINCIBILITY_PERIOD = 1.5f;
+constexpr float INVINCIBILITY_FLASH_PERIOD = 0.5f;
 
 /**
  * \brief windowBufferSize is the size of input stored by a client. 5 seconds of frame at 50 fps
  */
-constexpr std::size_t windowBufferSize = 5u * 50u;
+constexpr std::size_t WINDOW_BUFFER_SIZE = 5u * 50u;
 
 /**
  * \brief startDelay is the delay to wait before starting a game in milliseconds
  */
-constexpr long long startDelay = 3000;
+constexpr long long START_DELAY = 3000;
 /**
  * \brief maxInputNmb is the number of inputs stored into an PlayerInputPacket
  */
-constexpr std::size_t maxInputNmb = 50;
+constexpr std::size_t MAX_INPUT_NMB = 50;
 /**
  * \brief fixedPeriod is the period used in seconds to start a new FixedUpdate method in the game::GameManager
  */
-constexpr float fixedPeriod = 0.02f; //50fps
+constexpr float FIXED_PERIOD = 0.02f; //50fps
 
 
-constexpr std::array<core::Color, std::max(4u, maxPlayerNmb)> playerColors
+constexpr std::array<core::Color, std::max(4u, MAX_PLAYER_NMB)> PLAYER_COLORS
 {
     core::Color::red(),
     core::Color::blue(),
@@ -72,7 +72,7 @@ constexpr std::array<core::Color, std::max(4u, maxPlayerNmb)> playerColors
     core::Color::cyan()
 };
 
-constexpr std::array<core::Vec2f, std::max(4u, maxPlayerNmb)> spawnPositions
+constexpr std::array<core::Vec2f, std::max(4u, MAX_PLAYER_NMB)> SPAWN_POSITIONS
 {
     core::Vec2f(0,1),
     core::Vec2f(0,-1),
@@ -80,7 +80,7 @@ constexpr std::array<core::Vec2f, std::max(4u, maxPlayerNmb)> spawnPositions
     core::Vec2f(-1,0),
 };
 
-constexpr std::array<core::Degree, std::max(4u, maxPlayerNmb)> spawnRotations
+constexpr std::array<core::Degree, std::max(4u, MAX_PLAYER_NMB)> SPAWN_ROTATIONS
 {
     core::Degree(0.0f),
     core::Degree(180.0f),
