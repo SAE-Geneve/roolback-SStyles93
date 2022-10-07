@@ -91,4 +91,8 @@ Vec2f Vec2f::Lerp(Vec2f a, Vec2f b, float t)
 {
     return a + (b - a) * t;
 }
+Vec2f Vec2f::RightOrtho()
+{
+    return Vec2f{ y, -x };
+}
 }

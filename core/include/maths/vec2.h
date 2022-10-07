@@ -27,6 +27,7 @@ struct Vec2f
     [[nodiscard]] Vec2f Rotate(Degree rotation) const;
     static float Dot(Vec2f a, Vec2f b);
     static Vec2f Lerp(Vec2f a, Vec2f b, float t);
+    Vec2f RightOrtho();
 
     [[nodiscard]] operator sf::Vector2f() const { return { x, y }; }
 

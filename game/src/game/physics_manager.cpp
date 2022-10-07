@@ -16,6 +16,15 @@ PhysicsManager::PhysicsManager(core::EntityManager& entityManager) :
 
 }
 
+/**
+ * \brief Checks for overlapping between two spheres
+ * \param mySphere The first sphere to evaluate
+ * \param myBody The first rigidbody to evaluate
+ * \param otherSphere The second  sphere to evaluate
+ * \param otherBody The second rigidbody to evaluate
+ * \param mtv The minimum translation vector used in collision solving
+ * \return True if two spheres are overlapping
+ */
 bool IsOverlappingSphere(
     SphereCollider mySphere, Rigidbody myBody, 
     SphereCollider otherSphere, Rigidbody otherBody, 
@@ -32,13 +41,55 @@ bool IsOverlappingSphere(
     return (distanceMagnitude <= radiusSum);
 }
 
-//constexpr bool Box2Box(float r1x, float r1y, float r1w, float r1h, float r2x, float r2y, float r2w, float r2h)
-//{
-//    return r1x + r1w >= r2x &&    // r1 right edge past r2 left
-//        r1x <= r2x + r2w &&    // r1 left edge past r2 right
-//        r1y + r1h >= r2y &&    // r1 top edge past r2 bottom
-//        r1y <= r2y + r2h;
-//}
+/**
+ * \brief Solves collisions between two rigidbodies
+ * \param myBody The first rigidbody to evaluate and modify
+ * \param otherBody The second rigidbody to evaluate and modify
+ */
+void PhysicsManager::SolveCollision(Rigidbody myBody, Rigidbody otherBody)
+{
+    const core::Vec2f v1 = myBody.velocity;
+    const core::Vec2f v2 = otherBody.velocity;
+
+    core::Vec2f n = core::Vec2f(otherBody.position - myBody.position).GetNormalized();
+    core::Vec2f g = n.RightOrtho();
+
+    const float v1n = core::Vec2f::Dot(n, v1);
+    const float v1g = core::Vec2f::Dot(g, v1);
+    const float v2n = core::Vec2f::Dot(n, v2);
+    const float v2g = core::Vec2f::Dot(g, v2);
+
+    const core::Vec2f v1AfterImpact = core::Vec2f(n.x * v2n + g.x * v1g, n.y * v2n + g.y * v1g);
+    const core::Vec2f v2AfterImpact = core::Vec2f(n.x * v1n + g.x * v2g, n.y * v1n + g.y * v2g);
+
+    if (myBody.bodyType == BodyType::DYNAMIC)
+        myBody.velocity = v1AfterImpact * myBody.bounciness;
+    else
+        otherBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * otherBody.bounciness;
+
+    if (otherBody.bodyType == BodyType::DYNAMIC)
+        otherBody.velocity = v2AfterImpact * otherBody.bounciness;
+    else
+        myBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * myBody.bounciness;
+
+}
+
+/**
+ * \brief Solves the new positions of given rigidbodies
+ * \param myBody The first body to be modified
+ * \param otherBody The second body to be modified
+ * \param mtv The minimum translation vector given to solve the new positions of rigidbodies
+ */
+void PhysicsManager::SolveMTV(Rigidbody myBody, Rigidbody otherBody, core::Vec2f& mtv)
+{
+    if (mtv.GetSqrMagnitude() > 0.0f)
+    {
+        if (myBody.bodyType == BodyType::DYNAMIC)
+            myBody.position = myBody.position - (mtv * 0.5f);
+        if (myBody.bodyType == BodyType::DYNAMIC)
+            otherBody.position = otherBody.position + (mtv * 0.5f);
+    }
+}
 
 void PhysicsManager::FixedUpdate(sf::Time dt)
 {
@@ -76,6 +127,8 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
             if(IsOverlappingSphere(sphere1, rigidbody1, sphere2, rigidbody2, mtv_))
             {
                 onTriggerAction_.Execute(entity, otherEntity);
+                SolveCollision(rigidbody1, rigidbody2);
+                SolveMTV(rigidbody1, rigidbody2, mtv_);
             }
 
         }
