@@ -47,7 +47,7 @@ bool IsOverlappingSphere(
  * \param myBody The first rigidbody to evaluate and modify
  * \param otherBody The second rigidbody to evaluate and modify
  */
-void PhysicsManager::SolveCollision(Rigidbody myBody, Rigidbody otherBody)
+void PhysicsManager::SolveCollision(Rigidbody& myBody, Rigidbody& otherBody)
 {
     const core::Vec2f v1 = myBody.velocity;
     const core::Vec2f v2 = otherBody.velocity;
@@ -72,7 +72,6 @@ void PhysicsManager::SolveCollision(Rigidbody myBody, Rigidbody otherBody)
         otherBody.velocity = v2AfterImpact * otherBody.bounciness;
     else
         myBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * myBody.bounciness;
-
 }
 
 /**
@@ -81,7 +80,7 @@ void PhysicsManager::SolveCollision(Rigidbody myBody, Rigidbody otherBody)
  * \param otherBody The second body to be modified
  * \param mtv The minimum translation vector given to solve the new positions of rigidbodies
  */
-void PhysicsManager::SolveMTV(Rigidbody myBody, Rigidbody otherBody, core::Vec2f& mtv)
+void PhysicsManager::SolveMTV(Rigidbody& myBody, Rigidbody& otherBody, const core::Vec2f& mtv)
 {
     if (mtv.GetSqrMagnitude() > 0.0f)
     {
@@ -102,6 +101,7 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
         if (!entityManager_.HasComponent(entity, static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY)))
             continue;
         auto rigidbody = rigidbodyManager_.GetComponent(entity);
+
         if(rigidbody.position.y > -5.0f)
         {
             rigidbody.velocity.y += GRAVITY * dt.asSeconds();
@@ -110,7 +110,17 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
         {
             rigidbody.position.y = -5.0f;
         }
+
         rigidbody.position += rigidbody.velocity * dt.asSeconds();
+
+        if (rigidbody.velocity.x > 0.0f)
+        {
+            rigidbody.velocity.x -= dt.asSeconds();
+        }
+    	else if(rigidbody.velocity.x < 0.0f)
+    	{
+            rigidbody.velocity.x += dt.asSeconds();
+    	}
 
     	rigidbodyManager_.SetComponent(entity, rigidbody);
     }
@@ -136,10 +146,7 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
             if(IsOverlappingSphere(sphere1, rigidbody1, sphere2, rigidbody2, mtv_))
             {
                 onTriggerAction_.Execute(entity, otherEntity);
-                SolveCollision(rigidbody1, rigidbody2);
-                SolveMTV(rigidbody1, rigidbody2, mtv_);
             }
-
         }
     }
 }

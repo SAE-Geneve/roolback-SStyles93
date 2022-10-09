@@ -316,37 +316,23 @@ PlayerInput RollbackManager::GetInputAtFrame(PlayerNumber playerNumber, Frame fr
 
 void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
 {
-    const std::function<void(const PlayerCharacter&, core::Entity, const Bullet&, core::Entity)> ManageCollision =
-        [this](const auto& player, auto playerEntity, const auto& bullet, auto bulletEntity)
+    const std::function<void(core::Entity, core::Entity)> ManageCollision =
+        [this](auto player1Entity, auto player2Entity)
     {
-        if (player.playerNumber != bullet.playerNumber)
-        {
-            gameManager_.DestroyBullet(bulletEntity);
-            //lower health point
-            auto playerCharacter = currentPlayerManager_.GetComponent(playerEntity);
-            if (playerCharacter.invincibilityTime <= 0.0f)
-            {
-                core::LogDebug(fmt::format("Player {} is hit by bullet", playerCharacter.playerNumber));
-                --playerCharacter.health;
-                playerCharacter.invincibilityTime = PLAYER_INVINCIBILITY_PERIOD;
-            }
-            currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
-        }
-    };
-    if (entityManager_.HasComponent(entity1, static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)) &&
-        entityManager_.HasComponent(entity2, static_cast<core::EntityMask>(ComponentType::BULLET)))
-    {
-        const auto& player = currentPlayerManager_.GetComponent(entity1);
-        const auto& bullet = currentBulletManager_.GetComponent(entity2);
-        ManageCollision(player, entity1, bullet, entity2);
+        auto player1Rigidbody = currentPhysicsManager_.GetRigidbody(player1Entity);
+        auto player2Rigidbody = currentPhysicsManager_.GetRigidbody(player2Entity);
+        auto mtv = currentPhysicsManager_.GetMTV();
 
-    }
-    if (entityManager_.HasComponent(entity2, static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)) &&
-        entityManager_.HasComponent(entity1, static_cast<core::EntityMask>(ComponentType::BULLET)))
+        game::PhysicsManager::SolveCollision(player1Rigidbody, player2Rigidbody);
+        game::PhysicsManager::SolveMTV(player1Rigidbody, player2Rigidbody, mtv);
+
+        currentPhysicsManager_.SetRigidbody(player1Entity, player1Rigidbody);
+        currentPhysicsManager_.SetRigidbody(player2Entity, player2Rigidbody);
+    };
+    if(entityManager_.HasComponent(entity1, static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER))&&
+        entityManager_.HasComponent(entity2,static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)))
     {
-        const auto& player = currentPlayerManager_.GetComponent(entity2);
-        const auto& bullet = currentBulletManager_.GetComponent(entity1);
-        ManageCollision(player, entity2, bullet, entity1);
+        ManageCollision(entity1, entity2);
     }
 }
 

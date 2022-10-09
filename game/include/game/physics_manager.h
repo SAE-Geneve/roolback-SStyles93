@@ -126,10 +126,13 @@ public:
     void Draw(sf::RenderTarget& renderTarget) override;
     void SetCenter(sf::Vector2f center) { center_ = center; }
     void SetWindowSize(sf::Vector2f newWindowSize) { windowSize_ = newWindowSize; }
-private:
 
-    static void SolveCollision(Rigidbody myBody, Rigidbody otherBody);
-    static void SolveMTV(Rigidbody myBody, Rigidbody otherBody, core::Vec2f& mtv);
+    static void SolveCollision(Rigidbody& myBody, Rigidbody& otherBody);
+    static void SolveMTV(Rigidbody& myBody, Rigidbody& otherBody, const core::Vec2f& mtv);
+
+    [[nodiscard]] core::Vec2f GetMTV() const { return mtv_; }
+
+private:
 
     core::EntityManager& entityManager_;
     RigidbodyManager rigidbodyManager_;
