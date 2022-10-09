@@ -1,4 +1,5 @@
 #include "game/physics_manager.h"
+
 #include "engine/transform.h"
 
 #include <SFML/Graphics/CircleShape.hpp>
@@ -101,9 +102,17 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
         if (!entityManager_.HasComponent(entity, static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY)))
             continue;
         auto rigidbody = rigidbodyManager_.GetComponent(entity);
+        if(rigidbody.position.y > -5.0f)
+        {
+            rigidbody.velocity.y += GRAVITY * dt.asSeconds();
+        }
+    	else if(rigidbody.position.y <= -5.0f && rigidbody.velocity.y < 0.0f)
+        {
+            rigidbody.position.y = -5.0f;
+        }
         rigidbody.position += rigidbody.velocity * dt.asSeconds();
-        rigidbody.rotation += rigidbody.angularVelocity * dt.asSeconds();
-        rigidbodyManager_.SetComponent(entity, rigidbody);
+
+    	rigidbodyManager_.SetComponent(entity, rigidbody);
     }
     for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
     {
