@@ -102,25 +102,49 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
             continue;
         auto rigidbody = rigidbodyManager_.GetComponent(entity);
 
-        if(rigidbody.position.y > -5.0f)
+        //Apply gravity
+    	if(rigidbody.position.y > LOWER_LIMIT)
         {
-            rigidbody.velocity.y += GRAVITY * dt.asSeconds();
+    		rigidbody.velocity.y += GRAVITY * dt.asSeconds();
         }
-    	else if(rigidbody.position.y <= -5.0f && rigidbody.velocity.y < 0.0f)
-        {
-            rigidbody.position.y = -5.0f;
-        }
+    	
+    	rigidbody.position += rigidbody.velocity * dt.asSeconds();
 
-        rigidbody.position += rigidbody.velocity * dt.asSeconds();
-
-        if (rigidbody.velocity.x > 0.0f)
+     //   //Reduce velocity over time
+     //   if (rigidbody.velocity.x > 0.0f)
+     //   {
+     //       rigidbody.velocity.x -= dt.asSeconds();
+     //   }
+    	//if (rigidbody.velocity.x < 0.0f)
+     //   {
+     //       rigidbody.velocity.x += dt.asSeconds();
+     //   }
+    	//if (rigidbody.velocity.y > 0.0f)
+     //   {
+     //       rigidbody.velocity.y -= dt.asSeconds();
+     //   }
+     //   if (rigidbody.velocity.y < 0.0f)
+     //   {
+     //       rigidbody.velocity.y += dt.asSeconds();
+     //   }
+        
+        //Block positions in limits
+        if(rigidbody.position.x < LEFT_LIMIT)
         {
-            rigidbody.velocity.x -= dt.asSeconds();
+            rigidbody.position.x = LEFT_LIMIT;
         }
-    	else if(rigidbody.velocity.x < 0.0f)
-    	{
-            rigidbody.velocity.x += dt.asSeconds();
-    	}
+        if(rigidbody.position.y < LOWER_LIMIT)
+        {
+            rigidbody.position.y = LOWER_LIMIT;
+        }
+        if (rigidbody.position.x > RIGHT_LIMIT)
+        {
+            rigidbody.position.x = RIGHT_LIMIT;
+        }
+    	if (rigidbody.position.y > UPPER_LIMIT)
+        {
+            rigidbody.position.y = UPPER_LIMIT;
+        }
 
     	rigidbodyManager_.SetComponent(entity, rigidbody);
     }

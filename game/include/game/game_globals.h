@@ -37,7 +37,7 @@ using Frame = std::uint32_t;
 constexpr std::uint32_t MAX_PLAYER_NMB = 2;
 constexpr short PLAYER_HEALTH = 5;
 constexpr float PLAYER_SPEED = 5.0f;
-constexpr float PLAYER_JUMP_FORCE = 5.0f;
+constexpr float PLAYER_JUMP_FORCE = 1.0f;
 constexpr core::Degree PLAYER_ANGULAR_SPEED = core::Degree(90.0f);
 constexpr float PLAYER_SHOOTING_PERIOD = 0.3f;
 constexpr float BULLET_SPEED = 2.0f;
@@ -47,6 +47,10 @@ constexpr float PLAYER_INVINCIBILITY_PERIOD = 1.5f;
 constexpr float INVINCIBILITY_FLASH_PERIOD = 0.5f;
 
 constexpr  float GRAVITY = -9.81f;
+constexpr float UPPER_LIMIT = 6.0f;
+constexpr float RIGHT_LIMIT = 6.0f;
+constexpr float LOWER_LIMIT = -6.0f;
+constexpr float LEFT_LIMIT = -6.0f;
 
 /**
  * \brief windowBufferSize is the size of input stored by a client. 5 seconds of frame at 50 fps

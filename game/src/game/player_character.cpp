@@ -38,8 +38,9 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         //const bool down = input & PlayerInputEnum::PlayerInput::DOWN;
 
         const auto movement = ((left ? -1.0f : 0.0f) + (right ? 1.0f : 0.0f)) * PLAYER_SPEED;
-
         playerBody.position.x += movement * dt.asSeconds();
+
+    	playerBody.velocity.x = (left ? playerBody.velocity.x : 0.0f) + (right ? playerBody.velocity.x : 0.0f);
 
     	const auto jump = (up ? 1.0f : 0.0f) * PLAYER_JUMP_FORCE;
 
