@@ -25,7 +25,7 @@ GameManager::GameManager() :
     playerEntityMap_.fill(core::INVALID_ENTITY);
 }
 
-void GameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Degree rotation)
+void GameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction)
 {
     if (GetEntityFromPlayerNumber(playerNumber) != core::INVALID_ENTITY)
         return;
@@ -35,8 +35,7 @@ void GameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, c
 
     transformManager_.AddComponent(entity);
     transformManager_.SetPosition(entity, position);
-    transformManager_.SetRotation(entity, rotation);
-    rollbackManager_.SpawnPlayer(playerNumber, entity, position, rotation);
+    rollbackManager_.SpawnPlayer(playerNumber, entity, position, direction);
 }
 
 core::Entity GameManager::GetEntityFromPlayerNumber(PlayerNumber playerNumber) const
@@ -129,13 +128,14 @@ void ClientGameManager::Begin()
     {
         core::LogError("Could not load ship sprite");
     }
-    //load fonts
+
+
+	//load fonts
     if (!font_.loadFromFile("data/fonts/8-bit-hud.ttf"))
     {
         core::LogError("Could not load font");
     }
     textRenderer_.setFont(font_);
-    starBackground_.Init();
 }
 
 void ClientGameManager::Update(sf::Time dt)
@@ -155,14 +155,14 @@ void ClientGameManager::Update(sf::Time dt)
                 static_cast<core::EntityMask>(core::ComponentType::SPRITE)))
             {
                 const auto& player = rollbackManager_.GetPlayerCharacterManager().GetComponent(entity);
-                /*
+                
                 if (player.invincibilityTime > 0.0f)
                 {
-                    //auto leftV = std::fmod(player.invincibilityTime, INVINCIBILITY_FLASH_PERIOD);
-                    //auto rightV = INVINCIBILITY_FLASH_PERIOD / 2.0f;
-                    //core::LogDebug(fmt::format("Comparing {} and {} with time: {}", leftV, rightV, player.invincibilityTime));
+                    auto leftV = std::fmod(player.invincibilityTime, INVINCIBILITY_FLASH_PERIOD);
+                    auto rightV = INVINCIBILITY_FLASH_PERIOD / 2.0f;
+                    core::LogDebug(fmt::format("Comparing {} and {} with time: {}", leftV, rightV, player.invincibilityTime));
                 }
-                */
+                
                 if (player.invincibilityTime > 0.0f &&
                     std::fmod(player.invincibilityTime, INVINCIBILITY_FLASH_PERIOD) > INVINCIBILITY_FLASH_PERIOD / 2.0f)
                 {
@@ -221,7 +221,6 @@ void ClientGameManager::Draw(sf::RenderTarget& target)
     UpdateCameraView();
     target.setView(cameraView_);
 
-    starBackground_.Draw(target);
     spriteManager_.Draw(target);
 
     if(drawPhysics_)
@@ -316,11 +315,11 @@ void ClientGameManager::SetClientPlayer(PlayerNumber clientPlayer)
     clientPlayer_ = clientPlayer;
 }
 
-void ClientGameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Degree rotation)
+void ClientGameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction)
 {
     core::LogDebug(fmt::format("Spawn player: {}", playerNumber));
 
-    GameManager::SpawnPlayer(playerNumber, position, rotation);
+    GameManager::SpawnPlayer(playerNumber, position, direction);
     const auto entity = GetEntityFromPlayerNumber(playerNumber);
     spriteManager_.AddComponent(entity);
     spriteManager_.SetTexture(entity, shipTexture_);

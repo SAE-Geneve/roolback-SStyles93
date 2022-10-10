@@ -105,7 +105,7 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
         //Apply gravity
     	if(rigidbody.position.y > LOWER_LIMIT)
         {
-    		rigidbody.velocity.y += GRAVITY * dt.asSeconds();
+    		rigidbody.velocity.y += (GRAVITY * rigidbody.gravityScale) * dt.asSeconds();
         }
     	
     	rigidbody.position += rigidbody.velocity * dt.asSeconds();

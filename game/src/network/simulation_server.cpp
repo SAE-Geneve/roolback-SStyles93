@@ -127,9 +127,11 @@ void SimulationServer::SpawnNewPlayer(ClientId clientId, PlayerNumber playerNumb
 
     const auto pos = SPAWN_POSITIONS[playerNumber] * 3.0f;
     spawnPlayer->pos = ConvertToBinary(pos);
-    const auto rotation = SPAWN_ROTATIONS[playerNumber];
-    spawnPlayer->angle = core::ConvertToBinary(rotation);
-    gameManager_.SpawnPlayer(playerNumber, pos, rotation);
+    /*const auto rotation = SPAWN_DIRECTION[playerNumber];
+    spawnPlayer->angle = core::ConvertToBinary(rotation);*/
+    const auto dir = SPAWN_DIRECTION[playerNumber];
+    spawnPlayer->dir = ConvertToBinary(dir);
+    gameManager_.SpawnPlayer(playerNumber, pos, dir);
     SendReliablePacket(std::move(spawnPlayer));
 }
 }

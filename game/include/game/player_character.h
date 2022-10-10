@@ -12,12 +12,14 @@ class PhysicsManager;
  */
 struct PlayerCharacter
 {
-    float shootingTime = 0.0f;
     PlayerInput input = 0u;
     PlayerNumber playerNumber = INVALID_PLAYER;
     short health = PLAYER_HEALTH;
+    float shootingTime = 0.0f;
     float invincibilityTime = 0.0f;
     bool isGrounded = false;
+
+    core::Vec2f lookDir = core::Vec2f::zero();
 };
 class GameManager;
 
@@ -29,6 +31,8 @@ class PlayerCharacterManager : public core::ComponentManager<PlayerCharacter, st
 public:
     explicit PlayerCharacterManager(core::EntityManager& entityManager, PhysicsManager& physicsManager, GameManager& gameManager);
     void FixedUpdate(sf::Time dt);
+
+    void SetLookDirection(core::Entity entity, core::Vec2f lookDir);
 
 private:
     PhysicsManager& physicsManager_;

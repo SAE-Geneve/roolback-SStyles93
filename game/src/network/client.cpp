@@ -31,9 +31,10 @@ void Client::ReceivePacket(const Packet* packet)
         }
 
         const auto pos = core::ConvertFromBinary<core::Vec2f>(spawnPlayerPacket->pos);
-        const auto rotation = core::ConvertFromBinary<core::Degree>(spawnPlayerPacket->angle);
+        //const auto rotation = core::ConvertFromBinary<core::Degree>(spawnPlayerPacket->angle);
+        const auto dir = core::ConvertFromBinary<core::Vec2f>(spawnPlayerPacket->dir);
 
-        gameManager_.SpawnPlayer(playerNumber, pos, rotation);
+        gameManager_.SpawnPlayer(playerNumber, pos, dir);
         break;
     }
     case PacketType::START_GAME:

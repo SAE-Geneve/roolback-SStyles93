@@ -16,6 +16,18 @@ PlayerCharacterManager::PlayerCharacterManager(core::EntityManager& entityManage
 
 }
 
+void PlayerCharacterManager::SetLookDirection(core::Entity entity, core::Vec2f lookDir)
+{
+    if (!entityManager_.HasComponent(entity,
+        static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)))
+    {
+        return;
+    }
+    auto playerCharacter = GetComponent(entity);
+    playerCharacter.lookDir = lookDir;
+        
+}
+
 void PlayerCharacterManager::FixedUpdate(sf::Time dt)
 {
 
@@ -37,13 +49,13 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         const bool up = input & PlayerInputEnum::PlayerInput::UP;
         //const bool down = input & PlayerInputEnum::PlayerInput::DOWN;
 
+        //Set player movement
         const auto movement = ((left ? -1.0f : 0.0f) + (right ? 1.0f : 0.0f)) * PLAYER_SPEED;
-        playerBody.position.x += movement * dt.asSeconds();
-
+        playerBody.velocity.x += movement * dt.asSeconds();
     	playerBody.velocity.x = (left ? playerBody.velocity.x : 0.0f) + (right ? playerBody.velocity.x : 0.0f);
 
+		//Set player jump
     	const auto jump = (up ? 1.0f : 0.0f) * PLAYER_JUMP_FORCE;
-
         if(playerCharacter.isGrounded)
         {
             playerBody.velocity.y += jump;
@@ -55,6 +67,10 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
             playerCharacter.isGrounded = true;
             SetComponent(playerEntity, playerCharacter);
         }
+
+        //Set player's looking direction
+        playerCharacter.lookDir =
+            ((left ? core::Vec2f::left() : playerCharacter.lookDir) + (right ? core::Vec2f::right() : playerCharacter.lookDir));
 
     	physicsManager_.SetRigidbody(playerEntity, playerBody);
 
@@ -69,23 +85,23 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
             playerCharacter.shootingTime += dt.asSeconds();
             SetComponent(playerEntity, playerCharacter);
         }
-        ////Shooting mechanism
-        //if (playerCharacter.shootingTime >= PLAYER_SHOOTING_PERIOD)
-        //{
-        //    if (input & PlayerInputEnum::PlayerInput::SHOOT)
-        //    {
-        //        const auto currentPlayerSpeed = playerBody.velocity.GetMagnitude();
-        //        const auto bulletVelocity = dir *
-        //            ((core::Vec2f::Dot(playerBody.velocity, dir) > 0.0f ? currentPlayerSpeed : 0.0f)
-        //                + BULLET_SPEED);
-        //        const auto bulletPosition = playerBody.position + dir * 0.5f + playerBody.velocity * dt.asSeconds();
-        //        gameManager_.SpawnBullet(playerCharacter.playerNumber,
-        //            bulletPosition,
-        //            bulletVelocity);
-        //        playerCharacter.shootingTime = 0.0f;
-        //        SetComponent(playerEntity, playerCharacter);
-        //    }
-        //}
+        //Shooting mechanism
+        if (playerCharacter.shootingTime >= PLAYER_SHOOTING_PERIOD)
+        {
+            if (input & PlayerInputEnum::PlayerInput::SHOOT)
+            {
+                const auto currentPlayerSpeed = playerBody.velocity.GetMagnitude();
+                const auto bulletVelocity = playerCharacter.lookDir *
+                    ((core::Vec2f::Dot(playerBody.velocity, playerCharacter.lookDir) > 0.0f ? currentPlayerSpeed : 0.0f)
+                        + BULLET_SPEED);
+                const auto bulletPosition = playerBody.position + playerCharacter.lookDir * 0.5f + playerBody.velocity * dt.asSeconds();
+                gameManager_.SpawnBullet(playerCharacter.playerNumber,
+                    bulletPosition,
+                    bulletVelocity);
+                playerCharacter.shootingTime = 0.0f;
+                SetComponent(playerEntity, playerCharacter);
+            }
+        }
     }
 }
 }

@@ -38,7 +38,7 @@ constexpr std::uint32_t MAX_PLAYER_NMB = 2;
 constexpr short PLAYER_HEALTH = 5;
 constexpr float PLAYER_SPEED = 5.0f;
 constexpr float PLAYER_JUMP_FORCE = 1.0f;
-constexpr core::Degree PLAYER_ANGULAR_SPEED = core::Degree(90.0f);
+//constexpr core::Degree PLAYER_ANGULAR_SPEED = core::Degree(90.0f);
 constexpr float PLAYER_SHOOTING_PERIOD = 0.3f;
 constexpr float BULLET_SPEED = 2.0f;
 constexpr float BULLET_SCALE = 0.1f;
@@ -87,12 +87,12 @@ constexpr std::array<core::Vec2f, std::max(4u, MAX_PLAYER_NMB)> SPAWN_POSITIONS
     core::Vec2f(1,-1),
 };
 
-constexpr std::array<core::Degree, std::max(4u, MAX_PLAYER_NMB)> SPAWN_ROTATIONS
+constexpr std::array<core::Vec2f, std::max(4u, MAX_PLAYER_NMB)> SPAWN_DIRECTION
 {
-    core::Degree(0.0f),
-    core::Degree(0.0f),
-    core::Degree(0.0f),
-    core::Degree(0.0f),
+    core::Vec2f(1,0),
+    core::Vec2f(-1,0),
+    core::Vec2f(1,0),
+    core::Vec2f(-1,0),
 };
 
 enum class ComponentType : core::EntityMask

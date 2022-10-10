@@ -131,19 +131,19 @@ struct SpawnPlayerPacket : TypedPacket<PacketType::SPAWN_PLAYER>
     std::array<std::uint8_t, sizeof(ClientId)> clientId{};
     PlayerNumber playerNumber = INVALID_PLAYER;
     std::array<std::uint8_t, sizeof(core::Vec2f)> pos{};
-    std::array<std::uint8_t, sizeof(core::Degree)> angle{};
+    std::array<std::uint8_t, sizeof(core::Vec2f)> dir{};
 };
 
 inline sf::Packet& operator<<(sf::Packet& packet, const SpawnPlayerPacket& spawnPlayerPacket)
 {
     return packet << spawnPlayerPacket.clientId << spawnPlayerPacket.playerNumber <<
-        spawnPlayerPacket.pos << spawnPlayerPacket.angle;
+        spawnPlayerPacket.pos << spawnPlayerPacket.dir;
 }
 
 inline sf::Packet& operator>>(sf::Packet& packet, SpawnPlayerPacket& spawnPlayerPacket)
 {
     return packet >> spawnPlayerPacket.clientId >> spawnPlayerPacket.playerNumber >>
-        spawnPlayerPacket.pos >> spawnPlayerPacket.angle;
+        spawnPlayerPacket.pos >> spawnPlayerPacket.dir;
 }
 
     

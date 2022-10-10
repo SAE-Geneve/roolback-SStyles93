@@ -8,7 +8,6 @@
 
 #include "game_globals.h"
 #include "rollback_manager.h"
-#include "star_background.h"
 #include "engine/entity.h"
 #include "graphics/graphics.h"
 #include "graphics/sprite.h"
@@ -28,7 +27,7 @@ class GameManager
 public:
     GameManager();
     virtual ~GameManager() = default;
-    virtual void SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Degree rotation);
+    virtual void SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction);
     virtual core::Entity SpawnBullet(PlayerNumber, core::Vec2f position, core::Vec2f velocity);
     virtual void DestroyBullet(core::Entity entity);
     [[nodiscard]] core::Entity GetEntityFromPlayerNumber(PlayerNumber playerNumber) const;
@@ -79,9 +78,9 @@ public:
      * \brief SpawnPlayer is method that is called when receiving a SpawnPlayerPacket from the server.
      * \param playerNumber is the player number to be spawned
      * \param position is where the player character will be spawned
-     * \param rotation is the spawning angle of the player character 
+     * \param direction is the spawning direction in witch the player character looks 
      */
-    void SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Degree rotation) override;
+    void SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction) override;
     core::Entity SpawnBullet(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f velocity) override;
     void FixedUpdate();
     void SetPlayerInput(PlayerNumber playerNumber, PlayerInput playerInput, std::uint32_t inputFrame) override;
@@ -100,15 +99,17 @@ protected:
     sf::View cameraView_;
     PlayerNumber clientPlayer_ = INVALID_PLAYER;
     core::SpriteManager spriteManager_;
-    StarBackground starBackground_;
     float fixedTimer_ = 0.0f;
     unsigned long long startingTime_ = 0;
     std::uint32_t state_ = 0;
 
     sf::Texture shipTexture_;
     sf::Texture bulletTexture_;
-    sf::Font font_;
 
+	std::vector<sf::Texture> characterTextures_{};
+
+
+    sf::Font font_;
     sf::Text textRenderer_;
     bool drawPhysics_ = false;
 };
