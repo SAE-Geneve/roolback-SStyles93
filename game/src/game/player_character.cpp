@@ -25,6 +25,7 @@ void PlayerCharacterManager::SetLookDirection(core::Entity entity, core::Vec2f l
     }
     auto playerCharacter = GetComponent(entity);
     playerCharacter.lookDir = lookDir;
+    SetComponent(entity, playerCharacter);
         
 }
 
@@ -60,18 +61,23 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         {
             playerBody.velocity.y += jump;
             playerCharacter.isGrounded = false;
-            SetComponent(playerEntity, playerCharacter);
         }
         if(playerBody.position.y <= -5.0f)
         {
             playerCharacter.isGrounded = true;
-            SetComponent(playerEntity, playerCharacter);
+        }
+        //Set player's looking direction
+        if(right)
+        {
+            playerCharacter.lookDir = core::Vec2f::right();
+        }
+        if (left)
+        {
+            playerCharacter.lookDir = core::Vec2f::left();
         }
 
-        //Set player's looking direction
-        playerCharacter.lookDir =
-            ((left ? core::Vec2f::left() : playerCharacter.lookDir) + (right ? core::Vec2f::right() : playerCharacter.lookDir));
-
+    	SetComponent(playerEntity, playerCharacter);
+        
     	physicsManager_.SetRigidbody(playerEntity, playerBody);
 
         if (playerCharacter.invincibilityTime > 0.0f)
@@ -90,6 +96,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         {
             if (input & PlayerInputEnum::PlayerInput::SHOOT)
             {
+
                 const auto currentPlayerSpeed = playerBody.velocity.GetMagnitude();
                 const auto bulletVelocity = playerCharacter.lookDir *
                     ((core::Vec2f::Dot(playerBody.velocity, playerCharacter.lookDir) > 0.0f ? currentPlayerSpeed : 0.0f)
