@@ -109,24 +109,6 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
         }
     	
     	rigidbody.position += rigidbody.velocity * dt.asSeconds();
-
-     //   //Reduce velocity over time
-     //   if (rigidbody.velocity.x > 0.0f)
-     //   {
-     //       rigidbody.velocity.x -= dt.asSeconds();
-     //   }
-    	//if (rigidbody.velocity.x < 0.0f)
-     //   {
-     //       rigidbody.velocity.x += dt.asSeconds();
-     //   }
-    	//if (rigidbody.velocity.y > 0.0f)
-     //   {
-     //       rigidbody.velocity.y -= dt.asSeconds();
-     //   }
-     //   if (rigidbody.velocity.y < 0.0f)
-     //   {
-     //       rigidbody.velocity.y += dt.asSeconds();
-     //   }
         
         //Block positions in limits
         if(rigidbody.position.x < LEFT_LIMIT)

@@ -103,10 +103,14 @@ protected:
     unsigned long long startingTime_ = 0;
     std::uint32_t state_ = 0;
 
-    sf::Texture shipTexture_;
-    sf::Texture bulletTexture_;
 
+    //sf::Texture characterTexture_;
+    int textureIdx_ = 0;
+    float animationTime_ = 0;
+    sf::Sprite characterSprite_{};
 	std::vector<sf::Texture> characterTextures_{};
+
+    sf::Texture bulletTexture_{};
 
 
     sf::Font font_;

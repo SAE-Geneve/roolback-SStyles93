@@ -32,6 +32,8 @@ public:
     explicit PlayerCharacterManager(core::EntityManager& entityManager, PhysicsManager& physicsManager, GameManager& gameManager);
     void FixedUpdate(sf::Time dt);
 
+    
+
     void SetLookDirection(core::Entity entity, core::Vec2f lookDir);
 
 private:

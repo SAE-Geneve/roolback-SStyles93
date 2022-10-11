@@ -282,7 +282,7 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
     //playerBody.rotation = rotation;
 
     SphereCollider playerSphere;
-    playerSphere.radius = 0.25f;
+    playerSphere.radius = 0.5f;
 
     PlayerCharacter playerCharacter;
     playerCharacter.playerNumber = playerNumber;
@@ -306,6 +306,7 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
     //currentTransformManager_.SetRotation(entity, rotation);
+    currentTransformManager_.SetScale(entity, core::Vec2f{ 5.0f,5.0f });
     currentPlayerManager_.SetLookDirection(entity, lookDirection);
 }
 
@@ -337,16 +338,20 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
     {
         if (player.playerNumber != bullet.playerNumber)
         {
+            auto playerRigidbody = currentPhysicsManager_.GetRigidbody(playerEntity);
+            auto bulletRigidbody = currentPhysicsManager_.GetRigidbody(bulletEntity);
             gameManager_.DestroyBullet(bulletEntity);
             //lower health point
             auto playerCharacter = currentPlayerManager_.GetComponent(playerEntity);
             if (playerCharacter.invincibilityTime <= 0.0f)
             {
                 core::LogDebug(fmt::format("Player {} is hit by bullet", playerCharacter.playerNumber));
-                --playerCharacter.health;
+                //--playerCharacter.health;
                 playerCharacter.invincibilityTime = PLAYER_INVINCIBILITY_PERIOD;
+                playerRigidbody.velocity.x = bulletRigidbody.velocity.x;
             }
             currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
+            currentPhysicsManager_.SetRigidbody(playerEntity, playerRigidbody);
         }
     };
     if (entityManager_.HasComponent(entity1, static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)) &&

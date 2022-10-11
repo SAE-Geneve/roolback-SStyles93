@@ -48,12 +48,16 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         const bool right = input & PlayerInputEnum::PlayerInput::RIGHT;
         const bool left = input & PlayerInputEnum::PlayerInput::LEFT;
         const bool up = input & PlayerInputEnum::PlayerInput::UP;
-        //const bool down = input & PlayerInputEnum::PlayerInput::DOWN;
 
         //Set player movement
         const auto movement = ((left ? -1.0f : 0.0f) + (right ? 1.0f : 0.0f)) * PLAYER_SPEED;
         playerBody.velocity.x += movement * dt.asSeconds();
-    	playerBody.velocity.x = (left ? playerBody.velocity.x : 0.0f) + (right ? playerBody.velocity.x : 0.0f);
+
+    	//Reduce velocity over time
+        if (playerBody.velocity.x > 0.0f || playerBody.velocity.x < 0.0f)
+        {
+            playerBody.velocity.x += (0.0f - playerBody.velocity.x) * (dt.asSeconds() * 2.0f);
+        }
 
 		//Set player jump
     	const auto jump = (up ? 1.0f : 0.0f) * PLAYER_JUMP_FORCE;

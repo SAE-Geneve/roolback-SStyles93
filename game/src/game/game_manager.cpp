@@ -10,7 +10,6 @@
 #include <imgui.h>
 #include <chrono>
 
-
 #ifdef TRACY_ENABLE
 #include <Tracy.hpp>
 #endif
@@ -124,11 +123,23 @@ void ClientGameManager::Begin()
     {
         core::LogError("Could not load bullet sprite");
     }
-    if (!shipTexture_.loadFromFile("data/sprites/ship.png"))
+    /*if (!characterTexture_.loadFromFile("data/sprites/ship.png"))
     {
         core::LogError("Could not load ship sprite");
-    }
+    }*/
 
+    //LOAD SPRITES
+    for (size_t i = 1; i <= 4; i++)
+    {
+        sf::Texture newTexture;
+        std::stringstream path;
+        path << "data/sprites/cat_idle/cat_idle" << std::setw(2) << std::setfill('0') << i << ".png";
+    	if(!newTexture.loadFromFile(path.str()))
+    	{
+            core::LogError(fmt::format("Could not load cat_idle0{} sprite", i));
+    	}
+        characterTextures_.push_back(newTexture);
+    }
 
 	//load fonts
     if (!font_.loadFromFile("data/fonts/8-bit-hud.ttf"))
@@ -155,14 +166,14 @@ void ClientGameManager::Update(sf::Time dt)
                 static_cast<core::EntityMask>(core::ComponentType::SPRITE)))
             {
                 const auto& player = rollbackManager_.GetPlayerCharacterManager().GetComponent(entity);
-                
+
                 if (player.invincibilityTime > 0.0f)
                 {
                     auto leftV = std::fmod(player.invincibilityTime, INVINCIBILITY_FLASH_PERIOD);
                     auto rightV = INVINCIBILITY_FLASH_PERIOD / 2.0f;
                     core::LogDebug(fmt::format("Comparing {} and {} with time: {}", leftV, rightV, player.invincibilityTime));
                 }
-                
+
                 if (player.invincibilityTime > 0.0f &&
                     std::fmod(player.invincibilityTime, INVINCIBILITY_FLASH_PERIOD) > INVINCIBILITY_FLASH_PERIOD / 2.0f)
                 {
@@ -180,6 +191,25 @@ void ClientGameManager::Update(sf::Time dt)
                 transformManager_.SetScale(entity, rollbackManager_.GetTransformManager().GetScale(entity));
                 transformManager_.SetRotation(entity, rollbackManager_.GetTransformManager().GetRotation(entity));
             }
+
+            if(entityManager_.HasComponent(entity, static_cast<core::EntityMask>(core::ComponentType::SPRITE)))
+            {
+                //UPDATE GRAPHICS (ANIMATION)
+                characterSprite_ = spriteManager_.GetComponent(entity);
+                animationTime_ += dt.asSeconds();
+                constexpr float period = 0.5f;
+                if (animationTime_ >= period)
+                {
+                    textureIdx_++;
+                    if (textureIdx_ >= characterTextures_.size())
+                    {
+                        textureIdx_ = 0;
+                    }
+                    animationTime_ = 0;
+                }
+                characterSprite_.setTexture(characterTextures_[textureIdx_]);
+                spriteManager_.SetComponent(entity, characterSprite_);
+            }
         }
     }
     fixedTimer_ += dt.asSeconds();
@@ -187,13 +217,8 @@ void ClientGameManager::Update(sf::Time dt)
     {
         FixedUpdate();
         fixedTimer_ -= FIXED_PERIOD;
-
     }
-
-
-
 }
-
 void ClientGameManager::End()
 {
 }
@@ -322,8 +347,8 @@ void ClientGameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f posit
     GameManager::SpawnPlayer(playerNumber, position, direction);
     const auto entity = GetEntityFromPlayerNumber(playerNumber);
     spriteManager_.AddComponent(entity);
-    spriteManager_.SetTexture(entity, shipTexture_);
-    spriteManager_.SetOrigin(entity, sf::Vector2f(shipTexture_.getSize()) / 2.0f);
+    spriteManager_.SetTexture(entity, characterTextures_[0]);
+    spriteManager_.SetOrigin(entity, sf::Vector2f(characterTextures_[0].getSize()) / 2.0f);
     spriteManager_.SetColor(entity, PLAYER_COLORS[playerNumber]);
 
 }
