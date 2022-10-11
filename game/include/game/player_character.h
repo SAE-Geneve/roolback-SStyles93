@@ -7,6 +7,13 @@ namespace game
 {
 class PhysicsManager;
 
+enum class AnimationState
+{
+    IDLE,
+    WALK,
+    JUMP,
+    NONE
+};
 /**
  * \brief PlayerCharacter is a struct that holds information about the player character (when they can shoot again, their current input, and their current health).
  */
@@ -17,9 +24,12 @@ struct PlayerCharacter
     short health = PLAYER_HEALTH;
     float shootingTime = 0.0f;
     float invincibilityTime = 0.0f;
+
     bool isGrounded = false;
 
     core::Vec2f lookDir = core::Vec2f::zero();
+    AnimationState animationState = AnimationState::NONE;
+
 };
 class GameManager;
 
@@ -32,9 +42,8 @@ public:
     explicit PlayerCharacterManager(core::EntityManager& entityManager, PhysicsManager& physicsManager, GameManager& gameManager);
     void FixedUpdate(sf::Time dt);
 
-    
-
     void SetLookDirection(core::Entity entity, core::Vec2f lookDir);
+    void SetAnimationState(core::Entity entity, AnimationState animationState);
 
 private:
     PhysicsManager& physicsManager_;

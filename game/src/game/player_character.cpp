@@ -18,15 +18,16 @@ PlayerCharacterManager::PlayerCharacterManager(core::EntityManager& entityManage
 
 void PlayerCharacterManager::SetLookDirection(core::Entity entity, core::Vec2f lookDir)
 {
-    if (!entityManager_.HasComponent(entity,
-        static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)))
-    {
-        return;
-    }
     auto playerCharacter = GetComponent(entity);
     playerCharacter.lookDir = lookDir;
     SetComponent(entity, playerCharacter);
-        
+}
+
+void PlayerCharacterManager::SetAnimationState(core::Entity entity, AnimationState animationState)
+{
+    auto playerCharacter = GetComponent(entity);
+    playerCharacter.animationState = animationState;
+    SetComponent(entity, playerCharacter);
 }
 
 void PlayerCharacterManager::FixedUpdate(sf::Time dt)
@@ -58,8 +59,8 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         {
             playerBody.velocity.x += (0.0f - playerBody.velocity.x) * (dt.asSeconds() * 2.0f);
         }
-
-		//Set player jump
+        
+    	//Set player jump
     	const auto jump = (up ? 1.0f : 0.0f) * PLAYER_JUMP_FORCE;
         if(playerCharacter.isGrounded)
         {
@@ -69,8 +70,13 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         if(playerBody.position.y <= -5.0f)
         {
             playerCharacter.isGrounded = true;
+            playerCharacter.animationState = AnimationState::IDLE;
         }
-        //Set player's looking direction
+        playerCharacter.animationState = up ? AnimationState::JUMP : playerCharacter.animationState;
+        playerCharacter.animationState = right && !up && playerCharacter.isGrounded ? AnimationState::WALK : playerCharacter.animationState;
+        playerCharacter.animationState = left && !up && playerCharacter.isGrounded ? AnimationState::WALK : playerCharacter.animationState;
+
+    	//Set player's looking direction
         if(right)
         {
             playerCharacter.lookDir = core::Vec2f::right();

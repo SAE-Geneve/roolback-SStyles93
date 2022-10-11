@@ -52,6 +52,9 @@ constexpr float RIGHT_LIMIT = 6.0f;
 constexpr float LOWER_LIMIT = -6.0f;
 constexpr float LEFT_LIMIT = -6.0f;
 
+constexpr float ANIMATION_PERIOD = 0.25f;
+constexpr core::Vec2f PLAYER_SCALE{ 5.0f,5.0f };
+
 /**
  * \brief windowBufferSize is the size of input stored by a client. 5 seconds of frame at 50 fps
  */
@@ -99,8 +102,8 @@ enum class ComponentType : core::EntityMask
 {
     PLAYER_CHARACTER = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE),
     BULLET = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 1u,
-    ASTEROID = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 2u,
-    PLAYER_INPUT = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 3u,
+    DIRECTION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 2u,
+
     DESTROYED = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 4u,
 };
 

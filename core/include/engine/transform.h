@@ -53,7 +53,7 @@ public:
     [[nodiscard]] const std::vector<Vec2f>& GetAllScales() const;
     void SetScale(Entity entity, Vec2f scale);
 
-    [[nodiscard]] Degree GetRotation(Entity entity) const;
+	[[nodiscard]] Degree GetRotation(Entity entity) const;
     [[nodiscard]] const std::vector<Degree>& GetAllRotations() const;
     void SetRotation(Entity entity, Degree rotation);
 

@@ -60,6 +60,7 @@ class ClientGameManager final : public GameManager,
                                 public core::DrawInterface, public core::DrawImGuiInterface, public core::SystemInterface
 {
 public:
+
     enum State : std::uint32_t
     {
         STARTED = 1u << 0u,
@@ -105,13 +106,18 @@ protected:
 
 
     //sf::Texture characterTexture_;
-    int textureIdx_ = 0;
-    float animationTime_ = 0;
     sf::Sprite characterSprite_{};
-	std::vector<sf::Texture> characterTextures_{};
 
+    float animationTime_ = 0;
+    int textureIdleIdx_ = 0;
+    int textureJumpIdx_ = 0;
+    int textureWalkIdx_ = 0;
+	std::vector<sf::Texture> catIdleTextures_{};
+	std::vector<sf::Texture> catWalkTextures_{};
+	std::vector<sf::Texture> catJumpTextures_{};
     sf::Texture bulletTexture_{};
 
+    
 
     sf::Font font_;
     sf::Text textRenderer_;

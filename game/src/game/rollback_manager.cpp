@@ -91,6 +91,7 @@ void RollbackManager::SimulateToCurrentFrame()
         currentTransformManager_.SetRotation(entity, body.rotation);
     }
 }
+
 void RollbackManager::SetPlayerInput(PlayerNumber playerNumber, PlayerInput playerInput, Frame inputFrame)
 {
     //Should only be called on the server
@@ -212,6 +213,7 @@ void RollbackManager::ValidateFrame(Frame newValidateFrame)
     lastValidateFrame_ = newValidateFrame;
     createdEntities_.clear();
 }
+
 void RollbackManager::ConfirmFrame(Frame newValidateFrame, const std::array<PhysicsState, MAX_PLAYER_NMB>& serverPhysicsState)
 {
 
@@ -233,6 +235,7 @@ void RollbackManager::ConfirmFrame(Frame newValidateFrame, const std::array<Phys
         }
     }
 }
+
 PhysicsState RollbackManager::GetValidatePhysicsState(PlayerNumber playerNumber) const
 {
     PhysicsState state = 0;
@@ -289,6 +292,8 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
 
     currentPlayerManager_.AddComponent(entity);
     currentPlayerManager_.SetComponent(entity, playerCharacter);
+	currentPlayerManager_.SetLookDirection(entity, lookDirection);
+    currentPlayerManager_.SetAnimationState(entity, AnimationState::IDLE);
 
     currentPhysicsManager_.AddRigidbody(entity);
     currentPhysicsManager_.SetRigidbody(entity, playerBody);
@@ -304,10 +309,9 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
     lastValidatePhysicsManager_.SetSphere(entity, playerSphere);
 
     currentTransformManager_.AddComponent(entity);
-    currentTransformManager_.SetPosition(entity, position);
-    //currentTransformManager_.SetRotation(entity, rotation);
-    currentTransformManager_.SetScale(entity, core::Vec2f{ 5.0f,5.0f });
-    currentPlayerManager_.SetLookDirection(entity, lookDirection);
+	currentTransformManager_.SetPosition(entity, position);
+    currentTransformManager_.SetRotation(entity, core::Degree{ 0.0f });
+    currentTransformManager_.SetScale(entity, core::Vec2f{ PLAYER_SCALE.x  * lookDirection.x,PLAYER_SCALE.y});
 }
 
 PlayerInput RollbackManager::GetInputAtFrame(PlayerNumber playerNumber, Frame frame) const
