@@ -1,4 +1,6 @@
 
+#include "filesystem"
+
 #include "game/game_manager.h"
 
 #include "utils/log.h"
@@ -124,47 +126,10 @@ void ClientGameManager::Begin()
 	{
 		core::LogError("Could not load bullet sprite");
 	}
-	/*if (!characterTexture_.loadFromFile("data/sprites/ship.png"))
-	{
-		core::LogError("Could not load ship sprite");
-	}*/
 
-	//LOAD SPRITES
-	for (size_t i = 0; i <= 3; i++)
-	{
-		sf::Texture newTexture;
-		std::stringstream path;
-		path << "data/sprites/cat_idle/cat_idle" << std::setw(2) << std::setfill('0') << i << ".png";
-		if (!newTexture.loadFromFile(path.str()))
-		{
-			core::LogError(fmt::format("Could not load cat_idle0{} sprite", i));
-		}
-		catIdleTextures_.push_back(newTexture);
-	}
-
-	for (size_t i = 0; i <= 8; i++)
-	{
-		sf::Texture newTexture;
-		std::stringstream path;
-		path << "data/sprites/cat_jump/cat_jump" << std::setw(2) << std::setfill('0') << i << ".png";
-		if (!newTexture.loadFromFile(path.str()))
-		{
-			core::LogError(fmt::format("Could not load cat_jump0{} sprite", i));
-		}
-		catJumpTextures_.push_back(newTexture);
-	}
-	
-	for (size_t i = 0; i <= 1; i++)
-	{
-		sf::Texture newTexture;
-		std::stringstream path;
-		path << "data/sprites/cat_walk/cat_walk" << std::setw(2) << std::setfill('0') << i << ".png";
-		if (!newTexture.loadFromFile(path.str()))
-		{
-			core::LogError(fmt::format("Could not load cat_walk0{} sprite", i));
-		}
-		catWalkTextures_.push_back(newTexture);
-	}
+	LoadTexture(std::string("data/sprites/cat_idle"), catIdleTextures_);
+	LoadTexture(std::string("data/sprites/cat_jump"), catJumpTextures_);
+	LoadTexture(std::string("data/sprites/cat_walk"), catWalkTextures_);
 
 	//load fonts
 	if (!font_.loadFromFile("data/fonts/8-bit-hud.ttf"))
@@ -213,6 +178,7 @@ void ClientGameManager::Update(sf::Time dt)
 				//UPDATE GRAPHICS (ANIMATION)
 				characterSprite_ = spriteManager_.GetComponent(entity);
 				animationTime_ += dt.asSeconds();
+				
 				switch (player.animationState)
 				{
 				case AnimationState::IDLE:
@@ -248,7 +214,7 @@ void ClientGameManager::Update(sf::Time dt)
 					characterSprite_.setTexture(catWalkTextures_[textureWalkIdx_]);
 					break;
 				case AnimationState::JUMP:
-					if (animationTime_ >= ANIMATION_PERIOD)
+					if (animationTime_ >= ANIMATION_PERIOD / 2.0f)
 					{
 						if (player.isGrounded)
 						{
@@ -276,6 +242,7 @@ void ClientGameManager::Update(sf::Time dt)
 					core::LogError("AnimationState Default, not supposed to happen !");
 					break;
 				}
+				
 				spriteManager_.SetComponent(entity, characterSprite_);
 				transformManager_.SetPosition(entity, rollbackManager_.GetTransformManager().GetPosition(entity));
 				transformManager_.SetScale(entity, core::Vec2f{player.lookDir.x * PLAYER_SCALE.x, PLAYER_SCALE.y});
@@ -609,5 +576,50 @@ void ClientGameManager::UpdateCameraView()
 	cameraView_.zoom(currentZoom);
 
 }
+
+/**
+ * \brief Loads the textures from a given path
+ * \param path The path from witch we want to load textures
+ * \param textureVector The texture vector in witch we store the textures
+ */
+void ClientGameManager::LoadTexture(std::string path, std::vector<sf::Texture>& textureVector) const
+{
+	auto dirIter = std::filesystem::directory_iterator(path);
+	const int textureCount = std::count_if(
+		begin(dirIter),
+		end(dirIter),
+		[](auto& entry) { return entry.is_regular_file() && entry.path().extension() == ".png"; });
+
+	//LOAD SPRITES
+	for (size_t i = 0; i < textureCount; i++)
+	{
+		sf::Texture newTexture;
+		std::stringstream pathString;
+		pathString << path << "/" << std::setw(2) << std::setfill('0') << i << ".png";
+		if (!newTexture.loadFromFile(pathString.str()))
+		{
+			core::LogError(fmt::format("Could not load {}0{} sprite", path, i));
+		}
+		textureVector.push_back(newTexture);
+	}
+}
+
+//void ClientGameManager::PlayAnimation()
+//{
+//	if (animationTime_ >= ANIMATION_PERIOD)
+//	{
+//		textureIdleIdx_++;
+//		if (textureIdleIdx_ >= catIdleTextures_.size())
+//		{
+//			textureIdleIdx_ = 0;
+//		}
+//		animationTime_ = 0;
+//	}
+//	if (textureIdleIdx_ >= catIdleTextures_.size())
+//	{
+//		textureIdleIdx_ = catIdleTextures_.size() - 1;
+//	}
+//	characterSprite_.setTexture(catIdleTextures_[textureIdleIdx_]);
+//}
 
 }

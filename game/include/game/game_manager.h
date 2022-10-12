@@ -94,6 +94,8 @@ protected:
 
     void UpdateCameraView();
 
+	void LoadTexture(std::string path, std::vector<sf::Texture>& textureVector) const;
+
     PacketSenderInterface& packetSenderInterface_;
     sf::Vector2u windowSize_;
     sf::View originalView_;

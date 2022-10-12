@@ -369,7 +369,6 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         const auto& player = currentPlayerManager_.GetComponent(entity1);
         const auto& bullet = currentBulletManager_.GetComponent(entity2);
         ManageCollision(player, entity1, bullet, entity2);
-
     }
     if (entityManager_.HasComponent(entity2, static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)) &&
         entityManager_.HasComponent(entity1, static_cast<core::EntityMask>(ComponentType::BULLET)))
