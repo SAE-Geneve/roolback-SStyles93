@@ -324,6 +324,22 @@ PlayerInput RollbackManager::GetInputAtFrame(PlayerNumber playerNumber, Frame fr
 
 void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
 {
+    const std::function<void(core::Entity, Bullet, core::Entity, Bullet)> ManageBulletCollision =
+        [this](auto entity1, auto bullet1, auto entity2, auto bullet2)
+    {
+        auto bullet1Rigidbody = currentPhysicsManager_.GetRigidbody(entity1);
+        auto bullet2Rigidbody = currentPhysicsManager_.GetRigidbody(entity2);
+        auto mtv = currentPhysicsManager_.GetMTV();
+
+        game::PhysicsManager::SolveCollision(bullet1Rigidbody, bullet2Rigidbody);
+        game::PhysicsManager::SolveMTV(bullet1Rigidbody, bullet2Rigidbody, mtv);
+
+        currentPhysicsManager_.SetRigidbody(entity1, bullet1Rigidbody);
+        currentPhysicsManager_.SetRigidbody(entity2, bullet2Rigidbody);
+
+        gameManager_.DestroyBullet(entity1);
+        gameManager_.DestroyBullet((entity2));
+    };
     const std::function<void(core::Entity, core::Entity)> ManagePlayerCollision =
         [this](auto entity1, auto entity2)
     {
@@ -377,6 +393,13 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         const auto& player = currentPlayerManager_.GetComponent(entity2);
         const auto& bullet = currentBulletManager_.GetComponent(entity1);
         ManageCollision(player, entity2, bullet, entity1);
+    }
+    if (entityManager_.HasComponent(entity2, static_cast<core::EntityMask>(ComponentType::BULLET)) &&
+        entityManager_.HasComponent(entity1, static_cast<core::EntityMask>(ComponentType::BULLET)))
+    {
+        const auto& bullet1 = currentBulletManager_.GetComponent(entity1);
+        const auto& bullet2 = currentBulletManager_.GetComponent(entity2);
+        ManageBulletCollision(entity1, bullet1, entity2, bullet2);
     }
 }
 
