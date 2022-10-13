@@ -120,10 +120,10 @@ void ClientGameManager::Begin()
 		core::LogError("Could not load bullet sprite");
 	}
 	
-	animationManager_.LoadTexture("data/sprites/cat_idle", animationManager_.catIdle);
-	animationManager_.LoadTexture("data/sprites/cat_walk", animationManager_.catWalk);
-	animationManager_.LoadTexture("data/sprites/cat_jump", animationManager_.catJump);
-	//animationManager_.LoadTexture("data/sprites/cat_shoot", animationManager_.catShoot);
+	animationManager_.LoadTexture("cat_idle", animationManager_.catIdle);
+	animationManager_.LoadTexture("cat_walk", animationManager_.catWalk);
+	animationManager_.LoadTexture("cat_jump", animationManager_.catJump);
+	animationManager_.LoadTexture("cat_shoot", animationManager_.catShoot);
 
 	//load fonts
 	if (!font_.loadFromFile("data/fonts/8-bit-hud.ttf"))

@@ -56,14 +56,19 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         if(playerBody.position.y <= -5.0f)
         {
             playerCharacter.isGrounded = true;
-            playerCharacter.animationState = AnimationState::IDLE;
+			playerCharacter.animationState = AnimationState::IDLE;
+            
         }
-        
+
         //Set player AnimationState
-        playerCharacter.animationState = up && !shoot ? AnimationState::JUMP : playerCharacter.animationState;
-        playerCharacter.animationState = right && !up && !shoot && playerCharacter.isGrounded ? AnimationState::WALK : playerCharacter.animationState;
-        playerCharacter.animationState = left && !up && !shoot && playerCharacter.isGrounded ? AnimationState::WALK : playerCharacter.animationState;
-        playerCharacter.animationState = shoot ? AnimationState::SHOOT : playerCharacter.animationState;
+        playerCharacter.animationState = (right || left) && !up && !shoot && playerCharacter.isGrounded ?
+            AnimationState::WALK : playerCharacter.animationState;
+
+    	playerCharacter.animationState = up && !shoot ?
+            AnimationState::JUMP : playerCharacter.animationState;
+
+    	playerCharacter.animationState = shoot ?
+            AnimationState::SHOOT : playerCharacter.animationState;
 
 
     	//Set player's looking direction
@@ -94,6 +99,8 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         //Shooting mechanism
         if (playerCharacter.shootingTime >= PLAYER_SHOOTING_PERIOD)
         {
+            //playerCharacter.isShooting = false;
+
             if (shoot)
             {
                 const auto bulletVelocity = playerCharacter.lookDir * BULLET_SPEED;
@@ -101,9 +108,12 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
                 gameManager_.SpawnBullet(playerCharacter.playerNumber,
                     bulletPosition,
                     bulletVelocity);
+
+                //playerCharacter.isShooting = true;
                 playerCharacter.shootingTime = 0.0f;
-                SetComponent(playerEntity, playerCharacter);
+            	SetComponent(playerEntity, playerCharacter);
             }
+
         }
     }
 }

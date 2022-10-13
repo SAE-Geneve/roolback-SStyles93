@@ -18,11 +18,10 @@ struct PlayerCharacter
     short health = PLAYER_HEALTH;
     float shootingTime = 0.0f;
     float invincibilityTime = 0.0f;
-
     bool isGrounded = false;
+    bool isShooting = false;
 
     core::Vec2f lookDir = core::Vec2f::zero();
-    
     AnimationState animationState = AnimationState::NONE;
 };
 class GameManager;
