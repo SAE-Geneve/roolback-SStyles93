@@ -30,20 +30,12 @@ struct SphereCollider
 {
     float radius = 0.5f;
     bool isTrigger = false;
-    //bool isColliding = false;
-    //bool isOverlapping = false;
 };
 /**
  * \brief Rigidbody is a class that represents a rigid body.
  */
 struct Rigidbody
 {
-    /*core::Vec2f position = core::Vec2f::zero();
-    core::Vec2f velocity = core::Vec2f::zero();
-    core::Degree rotation = core::Degree(0.0f);*/
-
-    //std::unique_ptr<SphereCollider> collider;
-
     core::Vec2f position = core::Vec2f::zero();
     core::Degree rotation = core::Degree(0.0f);
 
@@ -59,15 +51,6 @@ struct Rigidbody
 
     BodyType bodyType = BodyType::DYNAMIC;
 };
-
-///**
-// * \brief Box is a class that represents an axis-aligned box collider
-// */
-//struct Box
-//{
-//    core::Vec2f extends = core::Vec2f::one();
-//    bool isTrigger = false;
-//};
 
 /**
  * \brief OnTriggerInterface is an interface for classes that needs to be called when two boxes are in contact.

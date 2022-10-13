@@ -34,6 +34,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         const bool right = input & PlayerInputEnum::PlayerInput::RIGHT;
         const bool left = input & PlayerInputEnum::PlayerInput::LEFT;
         const bool up = input & PlayerInputEnum::PlayerInput::UP;
+        const bool shoot = input & PlayerInputEnum::PlayerInput::SHOOT;
 
         //Set player movement
         const auto movement = ((left ? -1.0f : 0.0f) + (right ? 1.0f : 0.0f)) * PLAYER_SPEED;
@@ -44,7 +45,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         {
             playerBody.velocity.x += (0.0f - playerBody.velocity.x) * (dt.asSeconds() * 2.0f);
         }
-        
+
     	//Set player jump
     	const auto jump = (up ? 1.0f : 0.0f) * PLAYER_JUMP_FORCE;
         if(playerCharacter.isGrounded)
@@ -57,9 +58,13 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
             playerCharacter.isGrounded = true;
             playerCharacter.animationState = AnimationState::IDLE;
         }
-        playerCharacter.animationState = up ? AnimationState::JUMP : playerCharacter.animationState;
-        playerCharacter.animationState = right && !up && playerCharacter.isGrounded ? AnimationState::WALK : playerCharacter.animationState;
-        playerCharacter.animationState = left && !up && playerCharacter.isGrounded ? AnimationState::WALK : playerCharacter.animationState;
+        
+        //Set player AnimationState
+        playerCharacter.animationState = up && !shoot ? AnimationState::JUMP : playerCharacter.animationState;
+        playerCharacter.animationState = right && !up && !shoot && playerCharacter.isGrounded ? AnimationState::WALK : playerCharacter.animationState;
+        playerCharacter.animationState = left && !up && !shoot && playerCharacter.isGrounded ? AnimationState::WALK : playerCharacter.animationState;
+        playerCharacter.animationState = shoot ? AnimationState::SHOOT : playerCharacter.animationState;
+
 
     	//Set player's looking direction
         if(right)
@@ -89,7 +94,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         //Shooting mechanism
         if (playerCharacter.shootingTime >= PLAYER_SHOOTING_PERIOD)
         {
-            if (input & PlayerInputEnum::PlayerInput::SHOOT)
+            if (shoot)
             {
                 const auto bulletVelocity = playerCharacter.lookDir * BULLET_SPEED;
                 const auto bulletPosition = playerBody.position + playerCharacter.lookDir * 0.5f + playerBody.velocity * dt.asSeconds();
