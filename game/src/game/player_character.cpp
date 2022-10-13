@@ -74,8 +74,8 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
                 AnimationState::JUMP : playerCharacter.animationState;
 
             ////UNCOMMENT / COMMENT to use shoot in the air or not
-            //playerCharacter.animationState = shoot ?
-            playerCharacter.animationState = shoot && playerCharacter.isGrounded ?
+            playerCharacter.animationState = shoot ?
+            //playerCharacter.animationState = shoot && playerCharacter.isGrounded ?
                 AnimationState::SHOOT : playerCharacter.animationState;
         }
     	else
@@ -114,8 +114,8 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
             playerCharacter.isShooting = false;
 
             ////TO UNCOMMENT / COMMENT to use shoot in the air or not
-            //if (shoot)
-            if (shoot && playerCharacter.isGrounded)
+            if (shoot)
+            //if (shoot && playerCharacter.isGrounded)
             {
                 const auto bulletVelocity = playerCharacter.lookDir * BULLET_SPEED;
                 const auto bulletPosition = playerBody.position + playerCharacter.lookDir * 0.5f + playerBody.velocity * dt.asSeconds();
