@@ -12,12 +12,14 @@ namespace game
 {
 
 RollbackManager::RollbackManager(GameManager& gameManager, core::EntityManager& entityManager) :
-    gameManager_(gameManager), entityManager_(entityManager),
+    gameManager_(gameManager),entityManager_(entityManager),
     currentTransformManager_(entityManager),
-    currentPhysicsManager_(entityManager), currentPlayerManager_(entityManager, currentPhysicsManager_, gameManager_),
-    currentBulletManager_(entityManager, gameManager),
+    currentPhysicsManager_(entityManager),
+	currentPlayerManager_(entityManager, currentPhysicsManager_, gameManager_),
+    currentBulletManager_(entityManager, gameManager, currentPhysicsManager_),
     lastValidatePhysicsManager_(entityManager),
-    lastValidatePlayerManager_(entityManager, lastValidatePhysicsManager_, gameManager_), lastValidateBulletManager_(entityManager, gameManager)
+    lastValidatePlayerManager_(entityManager, lastValidatePhysicsManager_, gameManager_),
+	lastValidateBulletManager_(entityManager, gameManager, lastValidatePhysicsManager_)
 {
     for (auto& input : inputs_)
     {
@@ -282,18 +284,17 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
 #endif
     Rigidbody playerBody;
     playerBody.position = position;
-    //playerBody.rotation = rotation;
 
     SphereCollider playerSphere;
     playerSphere.radius = 0.5f;
 
     PlayerCharacter playerCharacter;
     playerCharacter.playerNumber = playerNumber;
+    playerCharacter.lookDir = lookDirection;
+    playerCharacter.animationState = AnimationState::NONE;
 
     currentPlayerManager_.AddComponent(entity);
     currentPlayerManager_.SetComponent(entity, playerCharacter);
-	currentPlayerManager_.SetLookDirection(entity, lookDirection);
-    currentPlayerManager_.SetAnimationState(entity, AnimationState::IDLE);
 
     currentPhysicsManager_.AddRigidbody(entity);
     currentPhysicsManager_.SetRigidbody(entity, playerBody);
@@ -388,7 +389,7 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
     bulletBody.velocity = velocity;
     bulletBody.gravityScale = 0.0f;
     SphereCollider bulletSphere;
-    bulletSphere.radius = 0.5f * BULLET_SCALE;
+    bulletSphere.radius = 0.08f * BULLET_SCALE;
 
     currentBulletManager_.AddComponent(entity);
     currentBulletManager_.SetComponent(entity, { BULLET_PERIOD, playerNumber });

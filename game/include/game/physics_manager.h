@@ -58,8 +58,6 @@ struct Rigidbody
     float mass = 0.0f;
 
     BodyType bodyType = BodyType::DYNAMIC;
-    bool isStatic = false;
-
 };
 
 ///**

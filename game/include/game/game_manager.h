@@ -8,6 +8,7 @@
 
 #include "game_globals.h"
 #include "rollback_manager.h"
+#include "animation_manager.h"
 #include "engine/entity.h"
 #include "graphics/graphics.h"
 #include "graphics/sprite.h"
@@ -94,8 +95,6 @@ protected:
 
     void UpdateCameraView();
 
-	void LoadTexture(std::string path, std::vector<sf::Texture>& textureVector) const;
-
     PacketSenderInterface& packetSenderInterface_;
     sf::Vector2u windowSize_;
     sf::View originalView_;
@@ -106,17 +105,7 @@ protected:
     unsigned long long startingTime_ = 0;
     std::uint32_t state_ = 0;
 
-
-    //sf::Texture characterTexture_;
-    sf::Sprite characterSprite_{};
-
-    float animationTime_ = 0;
-    int textureIdleIdx_ = 0;
-    int textureJumpIdx_ = 0;
-    int textureWalkIdx_ = 0;
-	std::vector<sf::Texture> catIdleTextures_{};
-	std::vector<sf::Texture> catWalkTextures_{};
-	std::vector<sf::Texture> catJumpTextures_{};
+    AnimationManager animationManager_;
     sf::Texture bulletTexture_{};
 
     

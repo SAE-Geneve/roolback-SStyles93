@@ -15,21 +15,6 @@ PlayerCharacterManager::PlayerCharacterManager(core::EntityManager& entityManage
 {
 
 }
-
-void PlayerCharacterManager::SetLookDirection(core::Entity entity, core::Vec2f lookDir)
-{
-    auto playerCharacter = GetComponent(entity);
-    playerCharacter.lookDir = lookDir;
-    SetComponent(entity, playerCharacter);
-}
-
-void PlayerCharacterManager::SetAnimationState(core::Entity entity, AnimationState animationState)
-{
-    auto playerCharacter = GetComponent(entity);
-    playerCharacter.animationState = animationState;
-    SetComponent(entity, playerCharacter);
-}
-
 void PlayerCharacterManager::FixedUpdate(sf::Time dt)
 {
 
@@ -106,11 +91,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         {
             if (input & PlayerInputEnum::PlayerInput::SHOOT)
             {
-
-                const auto currentPlayerSpeed = playerBody.velocity.GetMagnitude();
-                const auto bulletVelocity = playerCharacter.lookDir *
-                    ((core::Vec2f::Dot(playerBody.velocity, playerCharacter.lookDir) > 0.0f ? currentPlayerSpeed : 0.0f)
-                        + BULLET_SPEED);
+                const auto bulletVelocity = playerCharacter.lookDir * BULLET_SPEED;
                 const auto bulletPosition = playerBody.position + playerCharacter.lookDir * 0.5f + playerBody.velocity * dt.asSeconds();
                 gameManager_.SpawnBullet(playerCharacter.playerNumber,
                     bulletPosition,

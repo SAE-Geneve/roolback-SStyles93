@@ -38,11 +38,11 @@ constexpr std::uint32_t MAX_PLAYER_NMB = 2;
 constexpr short PLAYER_HEALTH = 5;
 constexpr float PLAYER_SPEED = 5.0f;
 constexpr float PLAYER_JUMP_FORCE = 1.0f;
-//constexpr core::Degree PLAYER_ANGULAR_SPEED = core::Degree(90.0f);
-constexpr float PLAYER_SHOOTING_PERIOD = 0.3f;
-constexpr float BULLET_SPEED = 2.0f;
-constexpr float BULLET_SCALE = 0.1f;
+constexpr float PLAYER_SHOOTING_PERIOD = 2.0f;
+constexpr float BULLET_SPEED = 5.0f;
+constexpr float BULLET_SCALE = 5.0f;
 constexpr float BULLET_PERIOD = 3.0f;
+constexpr float BULLET_ROTATION_SPEED = 1000.0f;
 constexpr float PLAYER_INVINCIBILITY_PERIOD = 1.5f;
 constexpr float INVINCIBILITY_FLASH_PERIOD = 0.5f;
 
@@ -103,7 +103,7 @@ enum class ComponentType : core::EntityMask
     PLAYER_CHARACTER = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE),
     BULLET = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 1u,
     DIRECTION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 2u,
-
+    ANIMATION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 3u,
     DESTROYED = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 4u,
 };
 

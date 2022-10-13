@@ -15,6 +15,8 @@ struct Bullet
 };
 
 class GameManager;
+class PhysicsManager;
+class PlayerCharacterManager;
 
 /**
  * \brief BulletManager is a ComponentManager that holds all the Bullet in one place.
@@ -23,9 +25,13 @@ class GameManager;
 class BulletManager : public core::ComponentManager<Bullet, static_cast<core::EntityMask>(ComponentType::BULLET)>
 {
 public:
-    explicit BulletManager(core::EntityManager& entityManager, GameManager& gameManager);
+    explicit BulletManager(
+        core::EntityManager& entityManager, GameManager& gameManager, PhysicsManager& physicsManager);
+
     void FixedUpdate(sf::Time dt);
+
 private:
     GameManager& gameManager_;
+    PhysicsManager& physicsManager_;
 };
 }

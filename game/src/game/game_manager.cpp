@@ -54,7 +54,7 @@ void GameManager::SetPlayerInput(PlayerNumber playerNumber, PlayerInput playerIn
 
 }
 
-	void GameManager::Validate(Frame newValidateFrame)
+void GameManager::Validate(Frame newValidateFrame)
 {
 
 #ifdef TRACY_ENABLE
@@ -112,7 +112,8 @@ void GameManager::WinGame(PlayerNumber winner)
 ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterface) :
 	GameManager(),
 	packetSenderInterface_(packetSenderInterface),
-	spriteManager_(entityManager_, transformManager_)
+	spriteManager_(entityManager_, transformManager_),
+	animationManager_(entityManager_, spriteManager_, *this)
 {
 }
 
@@ -126,10 +127,10 @@ void ClientGameManager::Begin()
 	{
 		core::LogError("Could not load bullet sprite");
 	}
-
-	LoadTexture(std::string("data/sprites/cat_idle"), catIdleTextures_);
-	LoadTexture(std::string("data/sprites/cat_jump"), catJumpTextures_);
-	LoadTexture(std::string("data/sprites/cat_walk"), catWalkTextures_);
+	
+	animationManager_.LoadTexture("data/sprites/cat_idle", animationManager_.catIdle);
+	animationManager_.LoadTexture("data/sprites/cat_walk", animationManager_.catWalk);
+	animationManager_.LoadTexture("data/sprites/cat_jump", animationManager_.catJump);
 
 	//load fonts
 	if (!font_.loadFromFile("data/fonts/8-bit-hud.ttf"))
@@ -151,12 +152,20 @@ void ClientGameManager::Update(sf::Time dt)
 		//Copy rollback transform position to our own
 		for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 		{
+			//Update Entities with a TRANSFORM
+			if (entityManager_.HasComponent(entity, static_cast<core::EntityMask>(core::ComponentType::TRANSFORM)))
+			{
+				transformManager_.SetScale(entity, rollbackManager_.GetTransformManager().GetScale(entity));
+				transformManager_.SetPosition(entity, rollbackManager_.GetTransformManager().GetPosition(entity));
+				transformManager_.SetRotation(entity, rollbackManager_.GetTransformManager().GetRotation(entity));
+			}
+			//Update Entities with PLAYER_CHARACTER
 			if (entityManager_.HasComponent(entity,
 				static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER) |
 				static_cast<core::EntityMask>(core::ComponentType::SPRITE) |
 				static_cast<core::EntityMask>(core::ComponentType::TRANSFORM)))
 			{
-				const auto& player = rollbackManager_.GetPlayerCharacterManager().GetComponent(entity);
+				auto& player = rollbackManager_.GetPlayerCharacterManager().GetComponent(entity);
 
 				if (player.invincibilityTime > 0.0f)
 				{
@@ -174,87 +183,13 @@ void ClientGameManager::Update(sf::Time dt)
 				{
 					spriteManager_.SetColor(entity, PLAYER_COLORS[player.playerNumber]);
 				}
+				//Updates the animations
+				animationManager_.UpdateEntity(entity, player.animationState, dt);
 
-				//UPDATE GRAPHICS (ANIMATION)
-				characterSprite_ = spriteManager_.GetComponent(entity);
-				animationTime_ += dt.asSeconds();
-				
-				switch (player.animationState)
-				{
-				case AnimationState::IDLE:
-					if (animationTime_ >= ANIMATION_PERIOD)
-					{
-						textureIdleIdx_++;
-						if (textureIdleIdx_ >= catIdleTextures_.size())
-						{
-							textureIdleIdx_ = 0;
-						}
-						animationTime_ = 0;
-					}
-					if (textureIdleIdx_ >= catIdleTextures_.size())
-					{
-						textureIdleIdx_ = catIdleTextures_.size()-1;
-					}
-					characterSprite_.setTexture(catIdleTextures_[textureIdleIdx_]);
-					break;
-				case AnimationState::WALK:
-					if (animationTime_ >= ANIMATION_PERIOD)
-					{
-						textureWalkIdx_++;
-						if (textureWalkIdx_ >= catWalkTextures_.size())
-						{
-							textureWalkIdx_ = 0;
-						}
-						animationTime_ = 0;
-					}
-					if (textureWalkIdx_ >= catWalkTextures_.size())
-					{
-						textureWalkIdx_ = catWalkTextures_.size()-1;
-					}
-					characterSprite_.setTexture(catWalkTextures_[textureWalkIdx_]);
-					break;
-				case AnimationState::JUMP:
-					if (animationTime_ >= ANIMATION_PERIOD / 2.0f)
-					{
-						if (player.isGrounded)
-						{
-							textureJumpIdx_ = 0;
-						}
-						textureJumpIdx_++;
-						if (textureJumpIdx_ >= catJumpTextures_.size())
-						{
-							textureJumpIdx_ = catJumpTextures_.size();
-						}
-						animationTime_ = 0;
-					}
-					if (textureJumpIdx_ >= catJumpTextures_.size())
-					{
-						textureJumpIdx_ = catJumpTextures_.size()-1;
-					}
-					characterSprite_.setTexture(catJumpTextures_[textureJumpIdx_]);
-					break;
-				case AnimationState::NONE:
-					//UpdateAnimation(characterSprite_, catIdleTextures_);
-					core::LogError("Animation state \"NONE\"");
-					break;
-				default:
-					//UpdateAnimation(characterSprite_, catIdleTextures_);
-					core::LogError("AnimationState Default, not supposed to happen !");
-					break;
-				}
-				
-				spriteManager_.SetComponent(entity, characterSprite_);
 				transformManager_.SetPosition(entity, rollbackManager_.GetTransformManager().GetPosition(entity));
 				transformManager_.SetScale(entity, core::Vec2f{player.lookDir.x * PLAYER_SCALE.x, PLAYER_SCALE.y});
 				transformManager_.SetRotation(entity, rollbackManager_.GetTransformManager().GetRotation(entity));
 			}
-
-			//if (entityManager_.HasComponent(entity, static_cast<core::EntityMask>(core::ComponentType::TRANSFORM)))
-			//{
-			//	//transformManager_.SetScale(entity, rollbackManager_.GetTransformManager().GetScale(entity));
-			//	//transformManager_.SetPosition(entity, rollbackManager_.GetTransformManager().GetPosition(entity));
-			//	//transformManager_.SetRotation(entity, rollbackManager_.GetTransformManager().GetRotation(entity));*/
-			//}
 		}
 	}
 	fixedTimer_ += dt.asSeconds();
@@ -393,8 +328,8 @@ void ClientGameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f posit
 	GameManager::SpawnPlayer(playerNumber, position, direction);
 	const auto entity = GetEntityFromPlayerNumber(playerNumber);
 	spriteManager_.AddComponent(entity);
-	spriteManager_.SetTexture(entity, catIdleTextures_[0]);
-	spriteManager_.SetOrigin(entity, sf::Vector2f(catIdleTextures_[0].getSize()) / 2.0f);
+	spriteManager_.SetTexture(entity, animationManager_.catIdle.textures[0]);
+	spriteManager_.SetOrigin(entity, sf::Vector2f(animationManager_.catIdle.textures[0].getSize()) / 2.0f);
 	spriteManager_.SetColor(entity, PLAYER_COLORS[playerNumber]);
 
 }
@@ -405,7 +340,8 @@ core::Entity ClientGameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec
 
 	spriteManager_.AddComponent(entity);
 	spriteManager_.SetTexture(entity, bulletTexture_);
-	spriteManager_.SetOrigin(entity, sf::Vector2f(bulletTexture_.getSize()) / 2.0f);
+	//spriteManager_.SetOrigin(entity, sf::Vector2f(bulletTexture_.getSize()) / 2.0f);
+	spriteManager_.SetOrigin(entity, sf::Vector2f(bulletTexture_.getSize()) / 1.8f);
 	spriteManager_.SetColor(entity, PLAYER_COLORS[playerNumber]);
 
 	return entity;
@@ -576,50 +512,5 @@ void ClientGameManager::UpdateCameraView()
 	cameraView_.zoom(currentZoom);
 
 }
-
-/**
- * \brief Loads the textures from a given path
- * \param path The path from witch we want to load textures
- * \param textureVector The texture vector in witch we store the textures
- */
-void ClientGameManager::LoadTexture(std::string path, std::vector<sf::Texture>& textureVector) const
-{
-	auto dirIter = std::filesystem::directory_iterator(path);
-	const int textureCount = std::count_if(
-		begin(dirIter),
-		end(dirIter),
-		[](auto& entry) { return entry.is_regular_file() && entry.path().extension() == ".png"; });
-
-	//LOAD SPRITES
-	for (size_t i = 0; i < textureCount; i++)
-	{
-		sf::Texture newTexture;
-		std::stringstream pathString;
-		pathString << path << "/" << std::setw(2) << std::setfill('0') << i << ".png";
-		if (!newTexture.loadFromFile(pathString.str()))
-		{
-			core::LogError(fmt::format("Could not load {}0{} sprite", path, i));
-		}
-		textureVector.push_back(newTexture);
-	}
-}
-
-//void ClientGameManager::PlayAnimation()
-//{
-//	if (animationTime_ >= ANIMATION_PERIOD)
-//	{
-//		textureIdleIdx_++;
-//		if (textureIdleIdx_ >= catIdleTextures_.size())
-//		{
-//			textureIdleIdx_ = 0;
-//		}
-//		animationTime_ = 0;
-//	}
-//	if (textureIdleIdx_ >= catIdleTextures_.size())
-//	{
-//		textureIdleIdx_ = catIdleTextures_.size() - 1;
-//	}
-//	characterSprite_.setTexture(catIdleTextures_[textureIdleIdx_]);
-//}
 
 }
