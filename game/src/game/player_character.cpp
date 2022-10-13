@@ -38,7 +38,11 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
 
         //Set player movement
         const auto movement = ((left ? -1.0f : 0.0f) + (right ? 1.0f : 0.0f)) * PLAYER_SPEED;
-        playerBody.velocity.x += movement * dt.asSeconds();
+        if(!playerCharacter.isShooting)
+        {
+            playerBody.velocity.x += movement * dt.asSeconds();
+        }
+    	
 
     	//Reduce velocity over time
         if (playerBody.velocity.x > 0.0f || playerBody.velocity.x < 0.0f)
@@ -53,24 +57,32 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
             playerBody.velocity.y += jump;
             playerCharacter.isGrounded = false;
         }
-        if(playerBody.position.y <= -5.0f)
-        {
-            playerCharacter.isGrounded = true;
-			playerCharacter.animationState = AnimationState::IDLE;
-            
-        }
 
         //Set player AnimationState
-        playerCharacter.animationState = (right || left) && !up && !shoot && playerCharacter.isGrounded ?
-            AnimationState::WALK : playerCharacter.animationState;
+        if(!playerCharacter.isShooting)
+        {
+            if (playerBody.position.y <= -5.0f)
+            {
+                playerCharacter.isGrounded = true;
+                playerCharacter.animationState = AnimationState::IDLE;
 
-    	playerCharacter.animationState = up && !shoot ?
-            AnimationState::JUMP : playerCharacter.animationState;
+            }
+            playerCharacter.animationState = (right || left) && !up && !shoot && playerCharacter.isGrounded ?
+                AnimationState::WALK : playerCharacter.animationState;
 
-    	playerCharacter.animationState = shoot ?
-            AnimationState::SHOOT : playerCharacter.animationState;
+            playerCharacter.animationState = up && !shoot ?
+                AnimationState::JUMP : playerCharacter.animationState;
 
-
+            ////UNCOMMENT / COMMENT to use shoot in the air or not
+            //playerCharacter.animationState = shoot ?
+            playerCharacter.animationState = shoot && playerCharacter.isGrounded ?
+                AnimationState::SHOOT : playerCharacter.animationState;
+        }
+    	else
+        {
+            playerCharacter.animationState = AnimationState::SHOOT;
+        }
+        
     	//Set player's looking direction
         if(right)
         {
@@ -99,9 +111,11 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         //Shooting mechanism
         if (playerCharacter.shootingTime >= PLAYER_SHOOTING_PERIOD)
         {
-            //playerCharacter.isShooting = false;
+            playerCharacter.isShooting = false;
 
-            if (shoot)
+            ////TO UNCOMMENT / COMMENT to use shoot in the air or not
+            //if (shoot)
+            if (shoot && playerCharacter.isGrounded)
             {
                 const auto bulletVelocity = playerCharacter.lookDir * BULLET_SPEED;
                 const auto bulletPosition = playerBody.position + playerCharacter.lookDir * 0.5f + playerBody.velocity * dt.asSeconds();
@@ -109,10 +123,11 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
                     bulletPosition,
                     bulletVelocity);
 
-                //playerCharacter.isShooting = true;
+                playerCharacter.isShooting = true;
                 playerCharacter.shootingTime = 0.0f;
-            	SetComponent(playerEntity, playerCharacter);
             }
+
+        	SetComponent(playerEntity, playerCharacter);
 
         }
     }

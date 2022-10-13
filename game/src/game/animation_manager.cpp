@@ -98,13 +98,7 @@ void AnimationManager::PlayAnimation(const core::Entity& entity,Animation& anima
 			animation.textureIdx++;
 			if (animation.textureIdx >= animation.textures.size())
 			{
-				if(!playerCharacter.isShooting)
-				{
 					animation.textureIdx = 0;
-				}else
-				{
-					animation.textureIdx = animation.textures.size() - 1;
-				}
 			}
 			animationTime_ = 0;
 		}
