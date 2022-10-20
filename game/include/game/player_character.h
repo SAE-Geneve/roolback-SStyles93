@@ -15,6 +15,7 @@ struct PlayerCharacter
 {
     PlayerInput input = 0u;
     PlayerNumber playerNumber = INVALID_PLAYER;
+    //short health = PLAYER_HEALTH;
     short health = PLAYER_HEALTH;
     float shootingTime = 0.0f;
     float invincibilityTime = 0.0f;

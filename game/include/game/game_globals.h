@@ -35,7 +35,7 @@ using Frame = std::uint32_t;
  * \brief mmaxPlayerNmb is a integer constant that defines the maximum number of player per game
  */
 constexpr std::uint32_t MAX_PLAYER_NMB = 2;
-constexpr short PLAYER_HEALTH = 5;
+constexpr short PLAYER_HEALTH = 3;
 constexpr float PLAYER_SPEED = 5.0f;
 constexpr float PLAYER_JUMP_FORCE = 1.0f;
 constexpr float PLAYER_SHOOTING_PERIOD = 1.0f;
@@ -45,16 +45,19 @@ constexpr float INVINCIBILITY_FLASH_PERIOD = 0.5f;
 constexpr float ANIMATION_PERIOD = 0.25f;
 
 constexpr float BULLET_SPEED = 5.0f;
-constexpr float BULLET_SCALE = 5.0f;
+constexpr float BULLET_SCALE = 2.0f;
 constexpr float BULLET_PERIOD = 3.0f;
-constexpr float BULLET_ROTATION_SPEED = 1000.0f;
+constexpr float BULLET_ROTATION_SPEED = 500.0f;
+
+constexpr float WALL_SCALE = 3.2f;
+constexpr core::Vec2f WALL_SIZE = core::Vec2f{ 1.0f, 1.0f };
 
 constexpr  float GRAVITY = -9.81f;
-constexpr float UPPER_LIMIT = 6.0f;
-constexpr float RIGHT_LIMIT = 6.0f;
-constexpr float LOWER_LIMIT = -6.0f;
-constexpr float LEFT_LIMIT = -6.0f;
 
+constexpr float UPPER_LIMIT = 8.0f;
+constexpr float RIGHT_LIMIT = 10.0f;
+constexpr float LOWER_LIMIT = -7.0f;
+constexpr float LEFT_LIMIT = -10.0f;
 
 /**
  * \brief windowBufferSize is the size of input stored by a client. 5 seconds of frame at 50 fps
@@ -78,9 +81,9 @@ constexpr float FIXED_PERIOD = 0.02f; //50fps
 constexpr std::array<core::Color, std::max(4u, MAX_PLAYER_NMB)> PLAYER_COLORS
 {
     core::Color::red(),
+    core::Color::cyan(),
     core::Color::blue(),
-    core::Color::yellow(),
-    core::Color::cyan()
+    core::Color::yellow()
 };
 
 constexpr std::array<core::Vec2f, std::max(4u, MAX_PLAYER_NMB)> SPAWN_POSITIONS
@@ -106,6 +109,7 @@ enum class ComponentType : core::EntityMask
     DIRECTION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 2u,
     ANIMATION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 3u,
     DESTROYED = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 4u,
+    BOX_COLLIDER = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) <<5u
 };
 
 /**

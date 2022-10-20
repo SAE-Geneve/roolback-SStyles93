@@ -38,7 +38,6 @@ void GameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, c
 	transformManager_.SetPosition(entity, position);
 	rollbackManager_.SpawnPlayer(playerNumber, entity, position, direction);
 }
-
 core::Entity GameManager::GetEntityFromPlayerNumber(PlayerNumber playerNumber) const
 {
 	return playerEntityMap_[playerNumber];
@@ -88,7 +87,7 @@ PlayerNumber GameManager::CheckWinner() const
 		if (!entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)))
 			continue;
 		const auto& player = playerManager.GetComponent(entity);
-		if (player.health > 0)
+		if (player.health > PLAYER_HEALTH)
 		{
 			alivePlayer++;
 			winner = player.playerNumber;
@@ -100,6 +99,18 @@ PlayerNumber GameManager::CheckWinner() const
 void GameManager::WinGame(PlayerNumber winner)
 {
 	winner_ = winner;
+}
+core::Entity GameManager::SpawnWall(core::Vec2f position)
+{
+	const auto entity = entityManager_.CreateEntity();
+
+	transformManager_.AddComponent(entity);
+	transformManager_.SetPosition(entity, position);
+	transformManager_.SetScale(entity, WALL_SIZE * WALL_SCALE);
+	transformManager_.SetRotation(entity, core::Degree(0.0f));
+	rollbackManager_.SpawnWall(entity, position);
+
+	return entity;
 }
 
 ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterface) :
@@ -114,27 +125,36 @@ void ClientGameManager::Begin()
 #ifdef TRACY_ENABLE
 	ZoneScoped;
 #endif
-	//load textures
-	if (!bulletTexture_.loadFromFile("data/sprites/bullet.png"))
-	{
-		core::LogError("Could not load bullet sprite");
-	}
-	
-	animationManager_.LoadTexture("cat_idle", animationManager_.catIdle);
-	animationManager_.LoadTexture("cat_walk", animationManager_.catWalk);
-	animationManager_.LoadTexture("cat_jump", animationManager_.catJump);
-	animationManager_.LoadTexture("cat_shoot", animationManager_.catShoot);
-
 	//load fonts
 	if (!font_.loadFromFile("data/fonts/8-bit-hud.ttf"))
 	{
 		core::LogError("Could not load font");
 	}
 	textRenderer_.setFont(font_);
+
+	LoadBackground("background");
+
+	if(!wallTexture_.loadFromFile("data/sprites/wall.png"))
+	{
+		core::LogError("Could not wall sprite");
+	}
+
+	animationManager_.LoadTexture("cat_idle", animationManager_.catIdle);
+	animationManager_.LoadTexture("cat_walk", animationManager_.catWalk);
+	animationManager_.LoadTexture("cat_jump", animationManager_.catJump);
+	animationManager_.LoadTexture("cat_shoot", animationManager_.catShoot);
+
+	//load textures
+	if (!bulletTexture_.loadFromFile("data/sprites/bullet.png"))
+	{
+		core::LogError("Could not load bullet sprite");
+	}
+
+	CreateBackground();
+
 }
 void ClientGameManager::Update(sf::Time dt)
 {
-
 #ifdef TRACY_ENABLE
 	ZoneScoped;
 #endif
@@ -144,8 +164,8 @@ void ClientGameManager::Update(sf::Time dt)
 		//Copy rollback transform position to our own
 		for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 		{
-			//Update Entities with a TRANSFORM
-			if (entityManager_.HasComponent(entity, static_cast<core::EntityMask>(core::ComponentType::TRANSFORM)))
+			//Update Entities (BULLET)
+			if (entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::BULLET)))
 			{
 				transformManager_.SetScale(entity, rollbackManager_.GetTransformManager().GetScale(entity));
 				transformManager_.SetPosition(entity, rollbackManager_.GetTransformManager().GetPosition(entity));
@@ -179,7 +199,7 @@ void ClientGameManager::Update(sf::Time dt)
 				animationManager_.UpdateEntity(entity, player.animationState, dt);
 
 				transformManager_.SetPosition(entity, rollbackManager_.GetTransformManager().GetPosition(entity));
-				transformManager_.SetScale(entity, core::Vec2f{player.lookDir.x * PLAYER_SCALE.x, PLAYER_SCALE.y});
+				transformManager_.SetScale(entity, core::Vec2f{ player.lookDir.x * PLAYER_SCALE.x, PLAYER_SCALE.y });
 				transformManager_.SetRotation(entity, rollbackManager_.GetTransformManager().GetRotation(entity));
 			}
 		}
@@ -326,10 +346,20 @@ core::Entity ClientGameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec
 
 	spriteManager_.AddComponent(entity);
 	spriteManager_.SetTexture(entity, bulletTexture_);
-	//spriteManager_.SetOrigin(entity, sf::Vector2f(bulletTexture_.getSize()) / 2.0f);
-	spriteManager_.SetOrigin(entity, sf::Vector2f(bulletTexture_.getSize()) / 1.8f);
+	spriteManager_.SetOrigin(entity, sf::Vector2f(bulletTexture_.getSize()) / 2.0f);
 	spriteManager_.SetColor(entity, PLAYER_COLORS[playerNumber]);
 
+	return entity;
+}
+core::Entity ClientGameManager::SpawnWall(core::Vec2f position)
+{
+	const auto entity = GameManager::SpawnWall(position);
+	
+	spriteManager_.AddComponent(entity);
+	spriteManager_.SetTexture(entity, wallTexture_);
+	spriteManager_.SetOrigin(entity, sf::Vector2f(wallTexture_.getSize()) / 2.0f);
+	spriteManager_.SetColor(entity, core::Color::green());
+	
 	return entity;
 }
 void ClientGameManager::FixedUpdate()
@@ -492,5 +522,37 @@ void ClientGameManager::UpdateCameraView()
 	cameraView_.zoom(currentZoom);
 
 }
+void ClientGameManager::LoadBackground(const std::string_view path)
+{
+	auto format = fmt::format("data/sprites/{}", path);
+	auto dirIter = std::filesystem::directory_iterator(fmt::format("data/sprites/{}", path));
+	const int textureCount = std::count_if(
+		begin(dirIter),
+		end(dirIter),
+		[](auto& entry) { return entry.is_regular_file() && entry.path().extension() == ".png"; });
 
+	//LOAD SPRITES
+	for (size_t i = 0; i < textureCount; i++)
+	{
+		sf::Texture newTexture;
+		const auto fullPath = fmt::format("data/sprites/{}/{}{}.png", path, path, i);
+		if (!newTexture.loadFromFile(fullPath))
+		{
+			core::LogError(fmt::format("Could not load data/sprites/{}/{}{}.png sprite", path, path, i));
+		}
+		backgroundTextures_.push_back(newTexture);
+	}
+}
+void ClientGameManager::CreateBackground()
+{
+	for (auto& background : backgroundTextures_)
+	{
+		const core::Entity entity = entityManager_.CreateEntity();
+		spriteManager_.AddComponent(entity);
+		spriteManager_.SetTexture(entity, background);
+		transformManager_.AddComponent(entity);
+		transformManager_.SetScale(entity, core::Vec2f(10.0f, 10.0f));
+		spriteManager_.SetOrigin(entity, sf::Vector2f(background.getSize()) / 2.0f);
+	}
+}
 }

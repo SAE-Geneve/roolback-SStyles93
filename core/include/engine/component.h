@@ -19,7 +19,7 @@ enum class ComponentType : Component
     TRANSFORM = POSITION | SCALE | ROTATION,
     SPRITE = 1u << 4u,
     RIGIDBODY = 1u << 5u,
-    SPHERECOLLIDER = 1u << 6u,
+    SPHERE_COLLIDER = 1u << 6u,
     OTHER_TYPE = 1u << 7u
 };
 

@@ -23,6 +23,12 @@ enum class BodyType
     STATIC
 };
 
+struct BoxCollider
+{
+    core::Vec2f extends = core::Vec2f::one();
+    bool isTrigger = false;
+};
+
 /**
  * \brief SphereCollider is a spherical shape collider used in the physics engine
  */
@@ -72,10 +78,20 @@ public:
     using ComponentManager::ComponentManager;
 };
 
+
 /**
  * \brief BoxManager is a ComponentManager that holds all the Box in the world.
  */
-class SphereColliderManager : public core::ComponentManager<SphereCollider, static_cast<core::EntityMask>(core::ComponentType::SPHERECOLLIDER)>
+class BoxColliderManager : public core::ComponentManager<BoxCollider, static_cast<core::EntityMask>(ComponentType::BOX_COLLIDER)>
+{
+public:
+    using ComponentManager::ComponentManager;
+};
+
+/**
+ * \brief BoxManager is a ComponentManager that holds all the Box in the world.
+ */
+class SphereColliderManager : public core::ComponentManager<SphereCollider, static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)>
 {
 public:
     using ComponentManager::ComponentManager;
@@ -89,6 +105,9 @@ class PhysicsManager : public core::DrawInterface
 {
 public:
     explicit PhysicsManager(core::EntityManager& entityManager);
+    void ApplyGravityToRigidbodies(sf::Time dt);
+    void LimitPlayerMovement();
+    void CheckForSphereCollisions();
     void FixedUpdate(sf::Time dt);
 
     void SetRigidbody(core::Entity entity, const Rigidbody& rigidbody);
@@ -98,6 +117,11 @@ public:
     void AddSphere(core::Entity entity);
     void SetSphere(core::Entity entity, const SphereCollider& sphere);
     [[nodiscard]] const SphereCollider& GetSphere(core::Entity entity) const;
+
+    void AddBox(core::Entity entity);
+    void SetBox(core::Entity entity, const BoxCollider& sphere);
+    [[nodiscard]] const BoxCollider& GetBox(core::Entity entity) const;
+
     /**
      * \brief RegisterTriggerListener is a method that stores an OnTriggerInterface in the PhysicsManager that will call the OnTrigger method in case of a trigger.
      * \param onTriggerInterface is the OnTriggerInterface to be called when a trigger occurs.
@@ -118,6 +142,7 @@ private:
     core::EntityManager& entityManager_;
     RigidbodyManager rigidbodyManager_;
     SphereColliderManager sphereColliderManager_;
+    BoxColliderManager boxColliderManager_;
     core::Action<core::Entity, core::Entity> onTriggerAction_;
     //Used for debug
     sf::Vector2f center_{};
