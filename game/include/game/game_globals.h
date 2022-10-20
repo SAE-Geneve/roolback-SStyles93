@@ -49,9 +49,6 @@ constexpr float BULLET_SCALE = 2.0f;
 constexpr float BULLET_PERIOD = 3.0f;
 constexpr float BULLET_ROTATION_SPEED = 500.0f;
 
-constexpr float WALL_SCALE = 3.2f;
-constexpr core::Vec2f WALL_SIZE = core::Vec2f{ 1.0f, 1.0f };
-
 constexpr  float GRAVITY = -9.81f;
 
 constexpr float UPPER_LIMIT = 8.0f;

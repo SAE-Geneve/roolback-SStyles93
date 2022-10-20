@@ -14,10 +14,7 @@ namespace game
 
 PhysicsManager::PhysicsManager(core::EntityManager& entityManager) :
 	entityManager_(entityManager), rigidbodyManager_(entityManager),
-	sphereColliderManager_(entityManager), boxColliderManager_(entityManager)
-{
-
-}
+	sphereColliderManager_(entityManager){}
 
 /**
  * \brief Checks for overlapping between a box and a sphere
@@ -215,61 +212,6 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 	ApplyGravityToRigidbodies(dt);
 	LimitPlayerMovement();
 	CheckForSphereCollisions();
-
-	//Sphere/box collisions
-	for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
-	{
-		//Check for mixed collisions
-		if (!entityManager_.HasComponent(entity,
-			static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
-			static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
-			entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
-			continue;
-		for (core::Entity otherEntity = entity + 1; otherEntity < entityManager_.GetEntitiesSize(); otherEntity++)
-		{
-			if (!entityManager_.HasComponent(otherEntity,
-				static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) | static_cast<core::EntityMask>(ComponentType::BOX_COLLIDER)) ||
-				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
-				continue;
-			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(entity);
-			const SphereCollider& sphere = sphereColliderManager_.GetComponent(entity);
-
-			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(otherEntity);
-			const BoxCollider& box = boxColliderManager_.GetComponent(otherEntity);
-
-			if (IsOverlappingBox(box, rigidbody1, sphere, rigidbody2, mtv_))
-			{
-				onTriggerAction_.Execute(entity, otherEntity);
-			}
-		}
-	}
-	//Sphere/box collisions
-	for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
-	{
-		//Check for mixed collisions
-		if (!entityManager_.HasComponent(entity,
-			static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
-			static_cast<core::EntityMask>(ComponentType::BOX_COLLIDER)) ||
-			entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
-			continue;
-		for (core::Entity otherEntity = entity + 1; otherEntity < entityManager_.GetEntitiesSize(); otherEntity++)
-		{
-			if (!entityManager_.HasComponent(otherEntity,
-				static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) | static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
-				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
-				continue;
-			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(otherEntity);
-			const SphereCollider& sphere = sphereColliderManager_.GetComponent(otherEntity);
-
-			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(entity);
-			const BoxCollider& box = boxColliderManager_.GetComponent(entity);
-
-			if (IsOverlappingBox(box, rigidbody1, sphere, rigidbody2, mtv_))
-			{
-				onTriggerAction_.Execute(entity, otherEntity);
-			}
-		}
-	}
 }
 
 void PhysicsManager::AddRigidbody(core::Entity entity)
@@ -302,21 +244,6 @@ const SphereCollider& PhysicsManager::GetSphere(core::Entity entity) const
 	return sphereColliderManager_.GetComponent(entity);
 }
 
-void PhysicsManager::AddBox(core::Entity entity)
-{
-	boxColliderManager_.AddComponent(entity);
-}
-
-void PhysicsManager::SetBox(core::Entity entity, const BoxCollider& box)
-{
-	boxColliderManager_.SetComponent(entity, box);
-}
-
-const BoxCollider& PhysicsManager::GetBox(core::Entity entity) const
-{
-	return boxColliderManager_.GetComponent(entity);
-}
-
 void PhysicsManager::RegisterTriggerListener(OnTriggerInterface& onTriggerInterface)
 {
 	onTriggerAction_.RegisterCallback(
@@ -327,7 +254,6 @@ void PhysicsManager::CopyAllComponents(const PhysicsManager& physicsManager)
 {
 	rigidbodyManager_.CopyAllComponents(physicsManager.rigidbodyManager_.GetAllComponents());
 	sphereColliderManager_.CopyAllComponents(physicsManager.sphereColliderManager_.GetAllComponents());
-	boxColliderManager_.CopyAllComponents(physicsManager.boxColliderManager_.GetAllComponents());
 }
 
 void PhysicsManager::Draw(sf::RenderTarget& renderTarget)
@@ -353,28 +279,6 @@ void PhysicsManager::Draw(sf::RenderTarget& renderTarget)
 			windowSize_.y - (spherePosition.y * core::PIXEL_PER_METER + center_.y));
 		circleShape.setRadius(radius * core::PIXEL_PER_METER);
 		renderTarget.draw(circleShape);
-	}
-
-	for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
-	{
-		if (!entityManager_.HasComponent(entity,
-			static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
-			static_cast<core::EntityMask>(ComponentType::BOX_COLLIDER)) ||
-			entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
-			continue;
-		const auto& [extends, isBoxTrigger] = boxColliderManager_.GetComponent(entity);
-		const auto& boxBody = rigidbodyManager_.GetComponent(entity);
-		sf::RectangleShape rectShape;
-		rectShape.setFillColor(core::Color::transparent());
-		rectShape.setOutlineColor(core::Color::green());
-		rectShape.setOutlineThickness(2.0f);
-		const auto boxPosition = boxBody.position;
-		rectShape.setOrigin({ extends.x * core::PIXEL_PER_METER, extends.y * core::PIXEL_PER_METER });
-		rectShape.setPosition(
-			boxPosition.x * core::PIXEL_PER_METER + center_.x,
-			windowSize_.y - (boxPosition.y * core::PIXEL_PER_METER + center_.y));
-		rectShape.setSize({ extends.x * 2.0f * core::PIXEL_PER_METER, extends.y * 2.0f * core::PIXEL_PER_METER });
-		renderTarget.draw(rectShape);
 	}
 }
 }

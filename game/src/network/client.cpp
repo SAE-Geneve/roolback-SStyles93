@@ -45,10 +45,6 @@ void Client::ReceivePacket(const Packet* packet)
             system_clock::now().time_since_epoch()
             ) + milliseconds(START_DELAY)).count() - milliseconds(static_cast<long long>(currentPing_)).count();
 
-        gameManager_.SpawnWall(core::Vec2f{ -6.0f, -9.0f });
-        gameManager_.SpawnWall(core::Vec2f{ -0.0f, -9.0f });
-        gameManager_.SpawnWall(core::Vec2f{ 6.0f, -9.0f });
-        gameManager_.SpawnWall(core::Vec2f{ 0.0f, -2.0f });
 
     	gameManager_.StartGame(startingTime);
         break;

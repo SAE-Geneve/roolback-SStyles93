@@ -352,7 +352,7 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
             if (playerCharacter.invincibilityTime <= 0.0f)
             {
                 core::LogDebug(fmt::format("Player {} is hit by bullet", playerCharacter.playerNumber));
-                //--playerCharacter.health;
+                --playerCharacter.health;
                 playerCharacter.invincibilityTime = PLAYER_INVINCIBILITY_PERIOD;
                 playerRigidbody.velocity.x = bulletRigidbody.velocity.x;
             }
@@ -376,21 +376,6 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
 
         gameManager_.DestroyBullet(entity1);
         gameManager_.DestroyBullet((entity2));
-    };
-
-    const std::function<void(core::Entity, core::Entity)> ManagePlatformCollision =
-        [this](auto entity1, auto entity2)
-    {
-        auto playerRigidbody = currentPhysicsManager_.GetRigidbody(entity1);
-        auto wallRigidbody = currentPhysicsManager_.GetRigidbody(entity2);
-        auto mtv = currentPhysicsManager_.GetMTV();
-
-        game::PhysicsManager::SolveCollision(playerRigidbody, wallRigidbody);
-        //game::PhysicsManager::SolveMTV(playerRigidbody, wallRigidbody, mtv);
-
-
-        currentPhysicsManager_.SetRigidbody(entity1, playerRigidbody);
-        currentPhysicsManager_.SetRigidbody(entity2, wallRigidbody);
     };
 
     //Collision between players
@@ -422,18 +407,6 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         const auto& bullet2 = currentBulletManager_.GetComponent(entity2);
         ManageBulletCollision(entity1, bullet1, entity2, bullet2);
     }
-    //Player collides with platform
-    if (entityManager_.HasComponent(entity1, static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)) &&
-        entityManager_.HasComponent(entity2, static_cast<core::EntityMask>(ComponentType::BOX_COLLIDER)))
-    {
-        ManagePlatformCollision(entity1, entity2);
-    }
-    if (entityManager_.HasComponent(entity2, static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)) &&
-        entityManager_.HasComponent(entity1, static_cast<core::EntityMask>(ComponentType::BOX_COLLIDER)))
-    {
-        ManagePlatformCollision(entity2, entity1);
-    }
-    
 }
 
 void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity, core::Vec2f position, core::Vec2f velocity)
@@ -459,34 +432,6 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
     currentTransformManager_.SetPosition(entity, position);
     currentTransformManager_.SetScale(entity, core::Vec2f::one() * BULLET_SCALE);
     currentTransformManager_.SetRotation(entity, core::Degree(0.0f));
-}
-
-void RollbackManager::SpawnWall(core::Entity entity, core::Vec2f position)
-{
-    Rigidbody wallBody;
-    wallBody.position = position;
-    wallBody.bounciness = 0.0f;
-    wallBody.gravityScale = 0.0f;
-    wallBody.bodyType = BodyType::STATIC;
-
-    BoxCollider wallCollider;
-    wallCollider.extends.x = WALL_SIZE.x;
-	wallCollider.extends.y = WALL_SIZE.y;
-
-    currentPhysicsManager_.AddRigidbody(entity);
-    currentPhysicsManager_.SetRigidbody(entity, wallBody);
-    currentPhysicsManager_.AddBox(entity);
-    currentPhysicsManager_.SetBox(entity, wallCollider);
-
-    lastValidatePhysicsManager_.AddRigidbody(entity);
-    lastValidatePhysicsManager_.SetRigidbody(entity, wallBody);
-    lastValidatePhysicsManager_.AddBox(entity);
-    lastValidatePhysicsManager_.SetBox(entity, wallCollider);
-
-    currentTransformManager_.AddComponent(entity);
-    currentTransformManager_.SetPosition(entity, position);
-    currentTransformManager_.SetRotation(entity, core::Degree{ 0.0f });
-    currentTransformManager_.SetScale(entity, WALL_SIZE * WALL_SCALE);
 }
 
 void RollbackManager::DestroyEntity(core::Entity entity)

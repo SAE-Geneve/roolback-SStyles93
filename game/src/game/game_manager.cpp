@@ -87,7 +87,7 @@ PlayerNumber GameManager::CheckWinner() const
 		if (!entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)))
 			continue;
 		const auto& player = playerManager.GetComponent(entity);
-		if (player.health > PLAYER_HEALTH)
+		if (player.health > 0)
 		{
 			alivePlayer++;
 			winner = player.playerNumber;
@@ -99,18 +99,6 @@ PlayerNumber GameManager::CheckWinner() const
 void GameManager::WinGame(PlayerNumber winner)
 {
 	winner_ = winner;
-}
-core::Entity GameManager::SpawnWall(core::Vec2f position)
-{
-	const auto entity = entityManager_.CreateEntity();
-
-	transformManager_.AddComponent(entity);
-	transformManager_.SetPosition(entity, position);
-	transformManager_.SetScale(entity, WALL_SIZE * WALL_SCALE);
-	transformManager_.SetRotation(entity, core::Degree(0.0f));
-	rollbackManager_.SpawnWall(entity, position);
-
-	return entity;
 }
 
 ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterface) :
@@ -349,17 +337,6 @@ core::Entity ClientGameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec
 	spriteManager_.SetOrigin(entity, sf::Vector2f(bulletTexture_.getSize()) / 2.0f);
 	spriteManager_.SetColor(entity, PLAYER_COLORS[playerNumber]);
 
-	return entity;
-}
-core::Entity ClientGameManager::SpawnWall(core::Vec2f position)
-{
-	const auto entity = GameManager::SpawnWall(position);
-	
-	spriteManager_.AddComponent(entity);
-	spriteManager_.SetTexture(entity, wallTexture_);
-	spriteManager_.SetOrigin(entity, sf::Vector2f(wallTexture_.getSize()) / 2.0f);
-	spriteManager_.SetColor(entity, core::Color::green());
-	
 	return entity;
 }
 void ClientGameManager::FixedUpdate()
