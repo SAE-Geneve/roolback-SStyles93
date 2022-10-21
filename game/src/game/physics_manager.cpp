@@ -116,7 +116,6 @@ void PhysicsManager::SolveMTV(Rigidbody& myBody, Rigidbody& otherBody, const cor
 	}
 }
 
-
 void PhysicsManager::ApplyGravityToRigidbodies(sf::Time dt)
 {
 	//General entities
@@ -204,7 +203,6 @@ void PhysicsManager::CheckForSphereCollisions()
 		}
 	}
 }
-
 
 void PhysicsManager::FixedUpdate(sf::Time dt)
 {

@@ -38,10 +38,12 @@ void GameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, c
 	transformManager_.SetPosition(entity, position);
 	rollbackManager_.SpawnPlayer(playerNumber, entity, position, direction);
 }
+
 core::Entity GameManager::GetEntityFromPlayerNumber(PlayerNumber playerNumber) const
 {
 	return playerEntityMap_[playerNumber];
 }
+
 void GameManager::SetPlayerInput(PlayerNumber playerNumber, PlayerInput playerInput, std::uint32_t inputFrame)
 {
 	if (playerNumber == INVALID_PLAYER)
@@ -50,6 +52,7 @@ void GameManager::SetPlayerInput(PlayerNumber playerNumber, PlayerInput playerIn
 	rollbackManager_.SetPlayerInput(playerNumber, playerInput, inputFrame);
 
 }
+
 void GameManager::Validate(Frame newValidateFrame)
 {
 
@@ -62,6 +65,7 @@ void GameManager::Validate(Frame newValidateFrame)
 	}
 	rollbackManager_.ValidateFrame(newValidateFrame);
 }
+
 core::Entity GameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f velocity)
 {
 	const core::Entity entity = entityManager_.CreateEntity();
@@ -73,10 +77,12 @@ core::Entity GameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec2f pos
 	rollbackManager_.SpawnBullet(playerNumber, entity, position, velocity);
 	return entity;
 }
+
 void GameManager::DestroyBullet(core::Entity entity)
 {
 	rollbackManager_.DestroyEntity(entity);
 }
+
 PlayerNumber GameManager::CheckWinner() const
 {
 	int alivePlayer = 0;
@@ -96,10 +102,12 @@ PlayerNumber GameManager::CheckWinner() const
 
 	return alivePlayer == 1 ? winner : INVALID_PLAYER;
 }
+
 void GameManager::WinGame(PlayerNumber winner)
 {
 	winner_ = winner;
 }
+
 core::Entity GameManager::SpawnWall(core::Vec2f position)
 {
 	const auto entity = entityManager_.CreateEntity();
@@ -113,6 +121,7 @@ core::Entity GameManager::SpawnWall(core::Vec2f position)
 	return entity;
 }
 
+
 ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterface) :
 	GameManager(),
 	packetSenderInterface_(packetSenderInterface),
@@ -120,6 +129,7 @@ ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterfac
 	animationManager_(entityManager_, spriteManager_, *this)
 {
 }
+
 void ClientGameManager::Begin()
 {
 #ifdef TRACY_ENABLE
@@ -134,7 +144,7 @@ void ClientGameManager::Begin()
 
 	LoadBackground("background");
 
-	if(!wallTexture_.loadFromFile("data/sprites/wall.png"))
+	if (!wallTexture_.loadFromFile("data/sprites/wall.png"))
 	{
 		core::LogError("Could not wall sprite");
 	}
@@ -153,6 +163,7 @@ void ClientGameManager::Begin()
 	CreateBackground();
 
 }
+
 void ClientGameManager::Update(sf::Time dt)
 {
 #ifdef TRACY_ENABLE
@@ -211,9 +222,11 @@ void ClientGameManager::Update(sf::Time dt)
 		fixedTimer_ -= FIXED_PERIOD;
 	}
 }
+
 void ClientGameManager::End()
 {
 }
+
 void ClientGameManager::SetWindowSize(sf::Vector2u windowsSize)
 {
 	windowSize_ = windowsSize;
@@ -227,6 +240,7 @@ void ClientGameManager::SetWindowSize(sf::Vector2u windowsSize)
 	currentPhysicsManager.SetCenter(sf::Vector2f(windowsSize) / 2.0f);
 	currentPhysicsManager.SetWindowSize(sf::Vector2f(windowsSize));
 }
+
 void ClientGameManager::Draw(sf::RenderTarget& target)
 {
 
@@ -324,10 +338,12 @@ void ClientGameManager::Draw(sf::RenderTarget& target)
 	}
 
 }
+
 void ClientGameManager::SetClientPlayer(PlayerNumber clientPlayer)
 {
 	clientPlayer_ = clientPlayer;
 }
+
 void ClientGameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction)
 {
 	core::LogDebug(fmt::format("Spawn player: {}", playerNumber));
@@ -340,6 +356,7 @@ void ClientGameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f posit
 	spriteManager_.SetColor(entity, PLAYER_COLORS[playerNumber]);
 
 }
+
 core::Entity ClientGameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f velocity)
 {
 	const auto entity = GameManager::SpawnBullet(playerNumber, position, velocity);
@@ -351,17 +368,19 @@ core::Entity ClientGameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec
 
 	return entity;
 }
+
 core::Entity ClientGameManager::SpawnWall(core::Vec2f position)
 {
 	const auto entity = GameManager::SpawnWall(position);
-	
+
 	spriteManager_.AddComponent(entity);
 	spriteManager_.SetTexture(entity, wallTexture_);
 	spriteManager_.SetOrigin(entity, sf::Vector2f(wallTexture_.getSize()) / 2.0f);
 	spriteManager_.SetColor(entity, core::Color::green());
-	
+
 	return entity;
 }
+
 void ClientGameManager::FixedUpdate()
 {
 
@@ -423,17 +442,20 @@ void ClientGameManager::FixedUpdate()
 	currentFrame_++;
 	rollbackManager_.StartNewFrame(currentFrame_);
 }
+
 void ClientGameManager::SetPlayerInput(PlayerNumber playerNumber, PlayerInput playerInput, std::uint32_t inputFrame)
 {
 	if (playerNumber == INVALID_PLAYER)
 		return;
 	GameManager::SetPlayerInput(playerNumber, playerInput, inputFrame);
 }
+
 void ClientGameManager::StartGame(unsigned long long int startingTime)
 {
 	core::LogDebug(fmt::format("Start game at starting time: {}", startingTime));
 	startingTime_ = startingTime;
 }
+
 void ClientGameManager::DrawImGui()
 {
 	ImGui::SetWindowFontScale(2.0f);
@@ -449,6 +471,7 @@ void ClientGameManager::DrawImGui()
 	}
 	ImGui::Checkbox("Draw Physics", &drawPhysics_);
 }
+
 void ClientGameManager::ConfirmValidateFrame(Frame newValidateFrame,
 	const std::array<PhysicsState, MAX_PLAYER_NMB>& physicsStates)
 {
@@ -474,11 +497,13 @@ void ClientGameManager::ConfirmValidateFrame(Frame newValidateFrame,
 	}
 	rollbackManager_.ConfirmFrame(newValidateFrame, physicsStates);
 }
+
 void ClientGameManager::WinGame(PlayerNumber winner)
 {
 	GameManager::WinGame(winner);
 	state_ = state_ | FINISHED;
 }
+
 void ClientGameManager::UpdateCameraView()
 {
 	if ((state_ & STARTED) != STARTED)
@@ -522,6 +547,7 @@ void ClientGameManager::UpdateCameraView()
 	cameraView_.zoom(currentZoom);
 
 }
+
 void ClientGameManager::LoadBackground(const std::string_view path)
 {
 	auto format = fmt::format("data/sprites/{}", path);
@@ -543,6 +569,7 @@ void ClientGameManager::LoadBackground(const std::string_view path)
 		backgroundTextures_.push_back(newTexture);
 	}
 }
+
 void ClientGameManager::CreateBackground()
 {
 	for (auto& background : backgroundTextures_)

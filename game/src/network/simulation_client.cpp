@@ -40,8 +40,6 @@ void SimulationClient::Update(sf::Time dt)
     gameManager_.Update(dt);
 }
 
-
-
 void SimulationClient::End()
 {
 #ifdef TRACY_ENABLE
@@ -61,8 +59,6 @@ void SimulationClient::Draw(sf::RenderTarget& renderTarget)
 #endif
     gameManager_.Draw(renderTarget);
 }
-
-
 
 void SimulationClient::SetPlayerInput(PlayerInput playerInput)
 {

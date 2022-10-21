@@ -10,7 +10,6 @@
 
 namespace game
 {
-
 void Server::ReceivePacket(std::unique_ptr<Packet> packet)
 {
 
