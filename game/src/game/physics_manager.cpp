@@ -23,47 +23,64 @@ PhysicsManager::PhysicsManager(core::EntityManager& entityManager) :
  * \brief Checks for overlapping between a box and a sphere
  * \param myBox The box to evaluate
  * \param myBody The first rigidbody to evaluate
- * \param otherSphere The sphere to evaluate
+ * \param otherCircle The circle to evaluate
  * \param otherBody The second rigidbody to evaluate
  * \param mtv The minimum translation vector used in collision solving
  * \return True if two spheres are overlapping
  */
-bool IsOverlappingBox(BoxCollider myBox, Rigidbody myBody,
-	SphereCollider otherSphere, Rigidbody otherBody,
-	core::Vec2f& mtv)
+bool Box2Circle(BoxCollider myBox, Rigidbody myBody,
+	CircleCollider otherCircle, Rigidbody otherBody/*,
+	core::Vec2f& mtv*/)
 {
-	const  core::Vec2f distance = otherBody.position - myBody.position;
+
+	const float min1X = myBody.position.x - myBox.extends.x / 2.0f;
+	const float max1X = myBody.position.x + myBox.extends.x / 2.0f;
+	const float min1Y = myBody.position.y - myBox.extends.y / 2.0f;
+	const float max1Y = myBody.position.y + myBox.extends.y / 2.0f;
+
+	const core::Vec2f distance = otherBody.position - myBody.position;
+
+	if((distance.GetNormalized() * otherCircle.radius).x < min1X &&
+		(distance.GetNormalized() * otherCircle.radius).x > max1X)
+	{
+		return false;
+	}
+	if ((distance.GetNormalized() * otherCircle.radius).y < min1Y &&
+		(distance.GetNormalized() * otherCircle.radius).y > max1Y)
+	{
+		return false;
+	}
 
 	const float distanceMagnitude = distance.GetMagnitude();
-	const float radiusSum = myBox.extends.GetMagnitude() + otherSphere.radius;
+	const float radiusSum = myBox.extends.GetMagnitude() + otherCircle.radius;
 
-	const float mtvDifference = radiusSum - distanceMagnitude;
-	mtv = distance.GetNormalized() * mtvDifference;
+	/*const float mtvDifference = radiusSum - distanceMagnitude;
+	mtv = distance.GetNormalized() * mtvDifference;*/
 
 	return (distanceMagnitude <= radiusSum);
 }
 
 /**
  * \brief Checks for overlapping between two spheres
- * \param mySphere The first sphere to evaluate
+ * \param myCircle The first circle to evaluate
  * \param myBody The first rigidbody to evaluate
- * \param otherSphere The second  sphere to evaluate
+ * \param otherCircle The second  circle to evaluate
  * \param otherBody The second rigidbody to evaluate
  * \param mtv The minimum translation vector used in collision solving
  * \return True if two spheres are overlapping
  */
-bool IsOverlappingSphere(
-	SphereCollider mySphere, Rigidbody myBody,
-	SphereCollider otherSphere, Rigidbody otherBody,
-	core::Vec2f& mtv)
+bool Circle2Circle(
+	CircleCollider myCircle, Rigidbody myBody,
+	CircleCollider otherCircle, Rigidbody otherBody/*,
+	  core::Vec2f& mtv*/)
 {
 	const  core::Vec2f distance = otherBody.position - myBody.position;
 
 	const float distanceMagnitude = distance.GetMagnitude();
-	const float radiusSum = mySphere.radius + otherSphere.radius;
+	const float radiusSum = myCircle.radius + otherCircle.radius;
 
-	const float mtvDifference = radiusSum - distanceMagnitude;
-	mtv = distance.GetNormalized() * mtvDifference;
+	/*const float mtvDifference = radiusSum - distanceMagnitude;
+	mtv = distance.GetNormalized() * mtvDifference;*/
 
 	return (distanceMagnitude <= radiusSum);
 }
@@ -173,11 +190,11 @@ void PhysicsManager::LimitPlayerMovement()
 	}
 }
 
-void PhysicsManager::CheckForSphereCollisions()
+void PhysicsManager::CheckForCircleCollisions()
 {
 	for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 	{
-		//Check for sphere collisions
+		//Check for circle collisions
 		if (!entityManager_.HasComponent(entity,
 			static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
 			static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
@@ -191,12 +208,12 @@ void PhysicsManager::CheckForSphereCollisions()
 				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 				continue;
 			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(entity);
-			const SphereCollider& sphere1 = sphereColliderManager_.GetComponent(entity);
+			const CircleCollider& circle1 = sphereColliderManager_.GetComponent(entity);
 
 			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(otherEntity);
-			const SphereCollider& sphere2 = sphereColliderManager_.GetComponent(otherEntity);
+			const CircleCollider& circle2 = sphereColliderManager_.GetComponent(otherEntity);
 
-			if (IsOverlappingSphere(sphere1, rigidbody1, sphere2, rigidbody2, mtv_))
+			if (Circle2Circle(circle1, rigidbody1, circle2, rigidbody2/*, mtv_*/))
 			{
 				onTriggerAction_.Execute(entity, otherEntity);
 			}
@@ -212,9 +229,9 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 
 	ApplyGravityToRigidbodies(dt);
 	LimitPlayerMovement();
-	CheckForSphereCollisions();
+	CheckForCircleCollisions();
 
-	//Sphere/box collisions
+	//Circle/box collisions
 	for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 	{
 		//Check for mixed collisions
@@ -230,18 +247,18 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 				continue;
 			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(entity);
-			const SphereCollider& sphere = sphereColliderManager_.GetComponent(entity);
+			const CircleCollider& circle = sphereColliderManager_.GetComponent(entity);
 
 			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(otherEntity);
 			const BoxCollider& box = boxColliderManager_.GetComponent(otherEntity);
 
-			if (IsOverlappingBox(box, rigidbody1, sphere, rigidbody2, mtv_))
+			if (Box2Circle(box, rigidbody1, circle, rigidbody2/*, mtv_*/))
 			{
 				onTriggerAction_.Execute(entity, otherEntity);
 			}
 		}
 	}
-	//Sphere/box collisions
+	//Circle/box collisions
 	for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 	{
 		//Check for mixed collisions
@@ -257,12 +274,12 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 				continue;
 			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(otherEntity);
-			const SphereCollider& sphere = sphereColliderManager_.GetComponent(otherEntity);
+			const CircleCollider& circle = sphereColliderManager_.GetComponent(otherEntity);
 
 			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(entity);
 			const BoxCollider& box = boxColliderManager_.GetComponent(entity);
 
-			if (IsOverlappingBox(box, rigidbody1, sphere, rigidbody2, mtv_))
+			if (Box2Circle(box, rigidbody1, circle, rigidbody2/*, mtv_*/))
 			{
 				onTriggerAction_.Execute(entity, otherEntity);
 			}
@@ -290,12 +307,12 @@ void PhysicsManager::AddSphere(core::Entity entity)
 	sphereColliderManager_.AddComponent(entity);
 }
 
-void PhysicsManager::SetSphere(core::Entity entity, const SphereCollider& sphere)
+void PhysicsManager::SetSphere(core::Entity entity, const CircleCollider& sphere)
 {
 	sphereColliderManager_.SetComponent(entity, sphere);
 }
 
-const SphereCollider& PhysicsManager::GetSphere(core::Entity entity) const
+const CircleCollider& PhysicsManager::GetSphere(core::Entity entity) const
 {
 	return sphereColliderManager_.GetComponent(entity);
 }

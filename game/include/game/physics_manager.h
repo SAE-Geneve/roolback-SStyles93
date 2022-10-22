@@ -32,7 +32,7 @@ struct BoxCollider
 /**
  * \brief SphereCollider is a spherical shape collider used in the physics engine
  */
-struct SphereCollider
+struct CircleCollider
 {
     float radius = 0.5f;
     bool isTrigger = false;
@@ -91,7 +91,7 @@ public:
 /**
  * \brief BoxManager is a ComponentManager that holds all the Box in the world.
  */
-class SphereColliderManager : public core::ComponentManager<SphereCollider, static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)>
+class SphereColliderManager : public core::ComponentManager<CircleCollider, static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)>
 {
 public:
     using ComponentManager::ComponentManager;
@@ -107,7 +107,7 @@ public:
     explicit PhysicsManager(core::EntityManager& entityManager);
     void ApplyGravityToRigidbodies(sf::Time dt);
     void LimitPlayerMovement();
-    void CheckForSphereCollisions();
+    void CheckForCircleCollisions();
     void FixedUpdate(sf::Time dt);
 
     void SetRigidbody(core::Entity entity, const Rigidbody& rigidbody);
@@ -115,8 +115,8 @@ public:
     [[nodiscard]] const Rigidbody& GetRigidbody(core::Entity entity) const;
 
     void AddSphere(core::Entity entity);
-    void SetSphere(core::Entity entity, const SphereCollider& sphere);
-    [[nodiscard]] const SphereCollider& GetSphere(core::Entity entity) const;
+    void SetSphere(core::Entity entity, const CircleCollider& sphere);
+    [[nodiscard]] const CircleCollider& GetSphere(core::Entity entity) const;
 
     void AddBox(core::Entity entity);
     void SetBox(core::Entity entity, const BoxCollider& sphere);

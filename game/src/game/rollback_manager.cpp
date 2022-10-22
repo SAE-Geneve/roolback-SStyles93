@@ -286,7 +286,7 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
     playerBody.position = position;
     //playerBody.bounciness = 0.0f;
 
-    SphereCollider playerSphere;
+    CircleCollider playerSphere;
     playerSphere.radius = 0.5f;
 
     PlayerCharacter playerCharacter;
@@ -333,7 +333,7 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         auto mtv = currentPhysicsManager_.GetMTV();
 
         game::PhysicsManager::SolveCollision(player1Rigidbody, player2Rigidbody);
-        game::PhysicsManager::SolveMTV(player1Rigidbody, player2Rigidbody, mtv);
+        //game::PhysicsManager::SolveMTV(player1Rigidbody, player2Rigidbody, mtv);
 
         currentPhysicsManager_.SetRigidbody(entity1, player1Rigidbody);
         currentPhysicsManager_.SetRigidbody(entity2, player2Rigidbody);
@@ -369,7 +369,7 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         auto mtv = currentPhysicsManager_.GetMTV();
 
         game::PhysicsManager::SolveCollision(bullet1Rigidbody, bullet2Rigidbody);
-        game::PhysicsManager::SolveMTV(bullet1Rigidbody, bullet2Rigidbody, mtv);
+        //game::PhysicsManager::SolveMTV(bullet1Rigidbody, bullet2Rigidbody, mtv);
 
         currentPhysicsManager_.SetRigidbody(entity1, bullet1Rigidbody);
         currentPhysicsManager_.SetRigidbody(entity2, bullet2Rigidbody);
@@ -444,7 +444,7 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
     bulletBody.position = position;
     bulletBody.velocity = velocity;
     bulletBody.gravityScale = 0.0f;
-    SphereCollider bulletSphere;
+    CircleCollider bulletSphere;
     bulletSphere.radius = 0.25f * BULLET_SCALE;
 
     currentBulletManager_.AddComponent(entity);
