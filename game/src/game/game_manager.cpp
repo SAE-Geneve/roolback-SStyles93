@@ -117,7 +117,6 @@ core::Entity GameManager::SpawnWall(core::Vec2f position)
 	transformManager_.SetScale(entity, WALL_SIZE * WALL_SCALE);
 	transformManager_.SetRotation(entity, core::Degree(0.0f));
 	rollbackManager_.SpawnWall(entity, position);
-
 	return entity;
 }
 

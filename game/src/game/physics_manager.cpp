@@ -14,7 +14,7 @@ namespace game
 
 PhysicsManager::PhysicsManager(core::EntityManager& entityManager) :
 	entityManager_(entityManager), rigidbodyManager_(entityManager),
-	sphereColliderManager_(entityManager), boxColliderManager_(entityManager)
+	circleColliderManager_(entityManager), boxColliderManager_(entityManager)
 {
 
 }
@@ -29,8 +29,8 @@ PhysicsManager::PhysicsManager(core::EntityManager& entityManager) :
  * \return True if two spheres are overlapping
  */
 bool Box2Circle(BoxCollider myBox, Rigidbody myBody,
-	CircleCollider otherCircle, Rigidbody otherBody/*,
-	core::Vec2f& mtv*/)
+	CircleCollider otherCircle, Rigidbody otherBody,
+	core::Vec2f& mtv)
 {
 
 	const float min1X = myBody.position.x - myBox.extends.x / 2.0f;
@@ -52,10 +52,10 @@ bool Box2Circle(BoxCollider myBox, Rigidbody myBody,
 	}
 
 	const float distanceMagnitude = distance.GetMagnitude();
-	const float radiusSum = myBox.extends.GetMagnitude() + otherCircle.radius;
+	const float radiusSum = myBox.extends.GetMagnitude()/2.0f + otherCircle.radius;
 
-	/*const float mtvDifference = radiusSum - distanceMagnitude;
-	mtv = distance.GetNormalized() * mtvDifference;*/
+	const float mtvDifference = radiusSum - distanceMagnitude;
+	mtv = distance.GetNormalized() * mtvDifference;
 
 	return (distanceMagnitude <= radiusSum);
 }
@@ -71,16 +71,16 @@ bool Box2Circle(BoxCollider myBox, Rigidbody myBody,
  */
 bool Circle2Circle(
 	CircleCollider myCircle, Rigidbody myBody,
-	CircleCollider otherCircle, Rigidbody otherBody/*,
-	  core::Vec2f& mtv*/)
+	CircleCollider otherCircle, Rigidbody otherBody,
+	  core::Vec2f& mtv)
 {
 	const  core::Vec2f distance = otherBody.position - myBody.position;
 
 	const float distanceMagnitude = distance.GetMagnitude();
 	const float radiusSum = myCircle.radius + otherCircle.radius;
 
-	/*const float mtvDifference = radiusSum - distanceMagnitude;
-	mtv = distance.GetNormalized() * mtvDifference;*/
+	const float mtvDifference = radiusSum - distanceMagnitude;
+	mtv = distance.GetNormalized() * mtvDifference;
 
 	return (distanceMagnitude <= radiusSum);
 }
@@ -106,15 +106,23 @@ void PhysicsManager::SolveCollision(Rigidbody& myBody, Rigidbody& otherBody)
 	const core::Vec2f v1AfterImpact = core::Vec2f(n.x * v2n + g.x * v1g, n.y * v2n + g.y * v1g);
 	const core::Vec2f v2AfterImpact = core::Vec2f(n.x * v1n + g.x * v2g, n.y * v1n + g.y * v2g);
 
-	if (myBody.bodyType == BodyType::DYNAMIC)
+	if (myBody.bodyType == BodyType::DYNAMIC) 
+	{
 		myBody.velocity = v1AfterImpact * myBody.bounciness;
-	else
+	}
+	else 
+	{
 		otherBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * otherBody.bounciness;
-
-	if (otherBody.bodyType == BodyType::DYNAMIC)
+	}
+	if (otherBody.bodyType == BodyType::DYNAMIC) 
+	{
 		otherBody.velocity = v2AfterImpact * otherBody.bounciness;
+	}
 	else
+	{
 		myBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * myBody.bounciness;
+	}
+
 }
 /**
  * \brief Solves the new positions of given rigidbodies
@@ -122,7 +130,7 @@ void PhysicsManager::SolveCollision(Rigidbody& myBody, Rigidbody& otherBody)
  * \param otherBody The second body to be modified
  * \param mtv The minimum translation vector given to solve the new positions of rigidbodies
  */
-void PhysicsManager::SolveMTV(Rigidbody& myBody, Rigidbody& otherBody, const core::Vec2f& mtv)
+void PhysicsManager::SolveMTV(Rigidbody& myBody, Rigidbody& otherBody, const core::Vec2f mtv)
 {
 	if (mtv.GetSqrMagnitude() > 0.0f)
 	{
@@ -143,7 +151,7 @@ void PhysicsManager::ApplyGravityToRigidbodies(sf::Time dt)
 		auto rigidbody = rigidbodyManager_.GetComponent(entity);
 
 		//Apply gravity
-		if (rigidbody.position.y > LOWER_LIMIT)
+		if (rigidbody.position.y > LOWER_LIMIT && rigidbody.bodyType == BodyType::DYNAMIC)
 		{
 			rigidbody.velocity.y += (GRAVITY * rigidbody.gravityScale) * dt.asSeconds();
 		}
@@ -170,7 +178,7 @@ void PhysicsManager::LimitPlayerMovement()
 		if (rigidbody.position.y < LOWER_LIMIT)
 		{
 			rigidbody.position.y = LOWER_LIMIT;
-			//Kill player
+			//TODO: Kill player && Respawn
 		}
 		//Block positions in limits
 		if (rigidbody.position.y > UPPER_LIMIT)
@@ -208,12 +216,12 @@ void PhysicsManager::CheckForCircleCollisions()
 				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 				continue;
 			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(entity);
-			const CircleCollider& circle1 = sphereColliderManager_.GetComponent(entity);
+			const CircleCollider& circle1 = circleColliderManager_.GetComponent(entity);
 
 			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(otherEntity);
-			const CircleCollider& circle2 = sphereColliderManager_.GetComponent(otherEntity);
+			const CircleCollider& circle2 = circleColliderManager_.GetComponent(otherEntity);
 
-			if (Circle2Circle(circle1, rigidbody1, circle2, rigidbody2/*, mtv_*/))
+			if (Circle2Circle(circle1, rigidbody1, circle2, rigidbody2, mtv_))
 			{
 				onTriggerAction_.Execute(entity, otherEntity);
 			}
@@ -247,12 +255,12 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 				continue;
 			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(entity);
-			const CircleCollider& circle = sphereColliderManager_.GetComponent(entity);
+			const CircleCollider& circle = circleColliderManager_.GetComponent(entity);
 
 			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(otherEntity);
 			const BoxCollider& box = boxColliderManager_.GetComponent(otherEntity);
 
-			if (Box2Circle(box, rigidbody1, circle, rigidbody2/*, mtv_*/))
+			if (Box2Circle(box, rigidbody1, circle, rigidbody2, mtv_))
 			{
 				onTriggerAction_.Execute(entity, otherEntity);
 			}
@@ -274,12 +282,12 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 				continue;
 			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(otherEntity);
-			const CircleCollider& circle = sphereColliderManager_.GetComponent(otherEntity);
+			const CircleCollider& circle = circleColliderManager_.GetComponent(otherEntity);
 
 			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(entity);
 			const BoxCollider& box = boxColliderManager_.GetComponent(entity);
 
-			if (Box2Circle(box, rigidbody1, circle, rigidbody2/*, mtv_*/))
+			if (Box2Circle(box, rigidbody1, circle, rigidbody2, mtv_))
 			{
 				onTriggerAction_.Execute(entity, otherEntity);
 			}
@@ -302,19 +310,19 @@ const Rigidbody& PhysicsManager::GetRigidbody(core::Entity entity) const
 	return rigidbodyManager_.GetComponent(entity);
 }
 
-void PhysicsManager::AddSphere(core::Entity entity)
+void PhysicsManager::AddCircle(core::Entity entity)
 {
-	sphereColliderManager_.AddComponent(entity);
+	circleColliderManager_.AddComponent(entity);
 }
 
-void PhysicsManager::SetSphere(core::Entity entity, const CircleCollider& sphere)
+void PhysicsManager::SetCircle(core::Entity entity, const CircleCollider& circle)
 {
-	sphereColliderManager_.SetComponent(entity, sphere);
+	circleColliderManager_.SetComponent(entity, circle);
 }
 
-const CircleCollider& PhysicsManager::GetSphere(core::Entity entity) const
+const CircleCollider& PhysicsManager::GetCircle(core::Entity entity) const
 {
-	return sphereColliderManager_.GetComponent(entity);
+	return circleColliderManager_.GetComponent(entity);
 }
 
 void PhysicsManager::AddBox(core::Entity entity)
@@ -341,7 +349,7 @@ void PhysicsManager::RegisterTriggerListener(OnTriggerInterface& onTriggerInterf
 void PhysicsManager::CopyAllComponents(const PhysicsManager& physicsManager)
 {
 	rigidbodyManager_.CopyAllComponents(physicsManager.rigidbodyManager_.GetAllComponents());
-	sphereColliderManager_.CopyAllComponents(physicsManager.sphereColliderManager_.GetAllComponents());
+	circleColliderManager_.CopyAllComponents(physicsManager.circleColliderManager_.GetAllComponents());
 	boxColliderManager_.CopyAllComponents(physicsManager.boxColliderManager_.GetAllComponents());
 }
 
@@ -354,7 +362,7 @@ void PhysicsManager::Draw(sf::RenderTarget& renderTarget)
 			static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
 			entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 			continue;
-		const auto& [radius, isTrigger] = sphereColliderManager_.GetComponent(entity);
+		const auto& [radius, isTrigger] = circleColliderManager_.GetComponent(entity);
 		const auto& sphereBody = rigidbodyManager_.GetComponent(entity);
 		sf::CircleShape circleShape;
 		circleShape.setFillColor(core::Color::transparent());

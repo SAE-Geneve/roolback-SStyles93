@@ -110,7 +110,7 @@ void AnimationManager::PlayAnimation(const core::Entity& entity,Animation& anima
 		break;
 
 	case AnimationState::NONE:
-		core::LogError("PlayAnimation trying to play \"NONE\"");
+		//core::LogError("PlayAnimation trying to play \"NONE\"");
 		break;
 
 	default:
@@ -118,36 +118,6 @@ void AnimationManager::PlayAnimation(const core::Entity& entity,Animation& anima
 		break;
 	}
 }
-
-//void AnimationManager::UpdateEntity(sf::Time dt)
-//{
-//	animationTime_ += dt.asSeconds();
-//
-//	/*switch (player.animationState)
-//	{
-//	case AnimationState::IDLE:
-//		PlayAnimation(entity, catIdleTextures_, 1.0f);
-//		break;
-//
-//	case AnimationState::WALK:
-//		PlayAnimation(entity, catWalkTextures_, 1.0f);
-//		break;
-//
-//	case AnimationState::JUMP:
-//		PlayAnimation(entity, catJumpTextures_, 2.0f);
-//		break;
-//
-//	case AnimationState::NONE:
-//
-//		core::LogError("Animation state \"NONE\"");
-//		break;
-//
-//	default:
-//
-//		core::LogError("AnimationState Default, not supposed to happen !");
-//		break;
-//	}*/
-//}
 
 void AnimationManager::UpdateEntity(core::Entity entity, AnimationState animationState, sf::Time dt)
 {
@@ -171,7 +141,7 @@ void AnimationManager::UpdateEntity(core::Entity entity, AnimationState animatio
 
 	case AnimationState::NONE:
 
-		core::LogError("Animation state \"NONE\"");
+		//core::LogError("Animation state \"NONE\"");
 		break;
 
 	default:

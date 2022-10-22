@@ -299,21 +299,21 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
 
     currentPhysicsManager_.AddRigidbody(entity);
     currentPhysicsManager_.SetRigidbody(entity, playerBody);
-    currentPhysicsManager_.AddSphere(entity);
-    currentPhysicsManager_.SetSphere(entity, playerSphere);
+    currentPhysicsManager_.AddCircle(entity);
+    currentPhysicsManager_.SetCircle(entity, playerSphere);
+
+    currentTransformManager_.AddComponent(entity);
+	currentTransformManager_.SetPosition(entity, position);
+    currentTransformManager_.SetRotation(entity, core::Degree{ 0.0f });
+    currentTransformManager_.SetScale(entity, core::Vec2f{ PLAYER_SCALE.x  * lookDirection.x,PLAYER_SCALE.y});
 
     lastValidatePlayerManager_.AddComponent(entity);
     lastValidatePlayerManager_.SetComponent(entity, playerCharacter);
 
     lastValidatePhysicsManager_.AddRigidbody(entity);
     lastValidatePhysicsManager_.SetRigidbody(entity, playerBody);
-    lastValidatePhysicsManager_.AddSphere(entity);
-    lastValidatePhysicsManager_.SetSphere(entity, playerSphere);
-
-    currentTransformManager_.AddComponent(entity);
-	currentTransformManager_.SetPosition(entity, position);
-    currentTransformManager_.SetRotation(entity, core::Degree{ 0.0f });
-    currentTransformManager_.SetScale(entity, core::Vec2f{ PLAYER_SCALE.x  * lookDirection.x,PLAYER_SCALE.y});
+    lastValidatePhysicsManager_.AddCircle(entity);
+    lastValidatePhysicsManager_.SetCircle(entity, playerSphere);
 }
 
 PlayerInput RollbackManager::GetInputAtFrame(PlayerNumber playerNumber, Frame frame) const
@@ -333,7 +333,7 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         auto mtv = currentPhysicsManager_.GetMTV();
 
         game::PhysicsManager::SolveCollision(player1Rigidbody, player2Rigidbody);
-        //game::PhysicsManager::SolveMTV(player1Rigidbody, player2Rigidbody, mtv);
+        game::PhysicsManager::SolveMTV(player1Rigidbody, player2Rigidbody, mtv);
 
         currentPhysicsManager_.SetRigidbody(entity1, player1Rigidbody);
         currentPhysicsManager_.SetRigidbody(entity2, player2Rigidbody);
@@ -369,7 +369,7 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         auto mtv = currentPhysicsManager_.GetMTV();
 
         game::PhysicsManager::SolveCollision(bullet1Rigidbody, bullet2Rigidbody);
-        //game::PhysicsManager::SolveMTV(bullet1Rigidbody, bullet2Rigidbody, mtv);
+        game::PhysicsManager::SolveMTV(bullet1Rigidbody, bullet2Rigidbody, mtv);
 
         currentPhysicsManager_.SetRigidbody(entity1, bullet1Rigidbody);
         currentPhysicsManager_.SetRigidbody(entity2, bullet2Rigidbody);
@@ -386,8 +386,7 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         auto mtv = currentPhysicsManager_.GetMTV();
 
         game::PhysicsManager::SolveCollision(playerRigidbody, wallRigidbody);
-        //game::PhysicsManager::SolveMTV(playerRigidbody, wallRigidbody, mtv);
-
+        game::PhysicsManager::SolveMTV(playerRigidbody, wallRigidbody, mtv);
 
         currentPhysicsManager_.SetRigidbody(entity1, playerRigidbody);
         currentPhysicsManager_.SetRigidbody(entity2, wallRigidbody);
@@ -452,8 +451,8 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
 
     currentPhysicsManager_.AddRigidbody(entity);
     currentPhysicsManager_.SetRigidbody(entity, bulletBody);
-    currentPhysicsManager_.AddSphere(entity);
-    currentPhysicsManager_.SetSphere(entity, bulletSphere);
+    currentPhysicsManager_.AddCircle(entity);
+    currentPhysicsManager_.SetCircle(entity, bulletSphere);
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
@@ -465,8 +464,7 @@ void RollbackManager::SpawnWall(core::Entity entity, core::Vec2f position)
 {
     Rigidbody wallBody;
     wallBody.position = position;
-    wallBody.bounciness = 0.0f;
-    wallBody.gravityScale = 0.0f;
+    wallBody.bounciness = 1.0f;
     wallBody.bodyType = BodyType::STATIC;
 
     BoxCollider wallCollider;

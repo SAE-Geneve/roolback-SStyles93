@@ -91,7 +91,7 @@ public:
 /**
  * \brief BoxManager is a ComponentManager that holds all the Box in the world.
  */
-class SphereColliderManager : public core::ComponentManager<CircleCollider, static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)>
+class CircleColliderManager : public core::ComponentManager<CircleCollider, static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)>
 {
 public:
     using ComponentManager::ComponentManager;
@@ -105,18 +105,20 @@ class PhysicsManager : public core::DrawInterface
 {
 public:
     explicit PhysicsManager(core::EntityManager& entityManager);
+    
     void ApplyGravityToRigidbodies(sf::Time dt);
     void LimitPlayerMovement();
     void CheckForCircleCollisions();
+
     void FixedUpdate(sf::Time dt);
 
     void SetRigidbody(core::Entity entity, const Rigidbody& rigidbody);
     void AddRigidbody(core::Entity entity);
     [[nodiscard]] const Rigidbody& GetRigidbody(core::Entity entity) const;
 
-    void AddSphere(core::Entity entity);
-    void SetSphere(core::Entity entity, const CircleCollider& sphere);
-    [[nodiscard]] const CircleCollider& GetSphere(core::Entity entity) const;
+    void AddCircle(core::Entity entity);
+    void SetCircle(core::Entity entity, const CircleCollider& circle);
+    [[nodiscard]] const CircleCollider& GetCircle(core::Entity entity) const;
 
     void AddBox(core::Entity entity);
     void SetBox(core::Entity entity, const BoxCollider& sphere);
@@ -133,7 +135,7 @@ public:
     void SetWindowSize(sf::Vector2f newWindowSize) { windowSize_ = newWindowSize; }
 
     static void SolveCollision(Rigidbody& myBody, Rigidbody& otherBody);
-    static void SolveMTV(Rigidbody& myBody, Rigidbody& otherBody, const core::Vec2f& mtv);
+    static void SolveMTV(Rigidbody& myBody, Rigidbody& otherBody, const core::Vec2f mtv);
 
     [[nodiscard]] core::Vec2f GetMTV() const { return mtv_; }
 
@@ -141,7 +143,7 @@ private:
 
     core::EntityManager& entityManager_;
     RigidbodyManager rigidbodyManager_;
-    SphereColliderManager sphereColliderManager_;
+    CircleColliderManager circleColliderManager_;
     BoxColliderManager boxColliderManager_;
     core::Action<core::Entity, core::Entity> onTriggerAction_;
     //Used for debug
