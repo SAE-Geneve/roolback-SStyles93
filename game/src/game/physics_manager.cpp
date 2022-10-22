@@ -124,7 +124,7 @@ void PhysicsManager::ApplyGravityToRigidbodies(sf::Time dt)
 		auto rigidbody = rigidbodyManager_.GetComponent(entity);
 
 		//Apply gravity
-		if (rigidbody.position.y > LOWER_LIMIT)
+		if (rigidbody.position.y > LOWER_LIMIT && rigidbody.bodyType == BodyType::DYNAMIC)
 		{
 			rigidbody.velocity.y += (GRAVITY * rigidbody.gravityScale) * dt.asSeconds();
 		}
@@ -135,14 +135,14 @@ void PhysicsManager::ApplyGravityToRigidbodies(sf::Time dt)
 	}
 }
 
-void PhysicsManager::LimitPlayerMovement()
+void PhysicsManager::LimitPlayerMovement(sf::Time dt)
 {
 	for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 	{
 		//Check for sphere collisions
 		if (!entityManager_.HasComponent(entity,
 			static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
-			static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
+			static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)) ||
 			entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 			continue;
 
@@ -165,6 +165,12 @@ void PhysicsManager::LimitPlayerMovement()
 		if (rigidbody.position.x < LEFT_LIMIT)
 		{
 			rigidbody.position.x = LEFT_LIMIT;
+		}
+
+		//Reduce velocity over time
+		if (rigidbody.velocity.x > 0.0f || rigidbody.velocity.x < 0.0f)
+		{
+			rigidbody.velocity.x += (0.0f - rigidbody.velocity.x) * (dt.asSeconds() * 2.0f);
 		}
 
 		rigidbodyManager_.SetComponent(entity, rigidbody);
@@ -210,7 +216,7 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 #endif
 
 	ApplyGravityToRigidbodies(dt);
-	LimitPlayerMovement();
+	LimitPlayerMovement(dt);
 	CheckForSphereCollisions();
 }
 

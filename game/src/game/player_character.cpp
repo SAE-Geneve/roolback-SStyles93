@@ -42,26 +42,19 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         {
             playerBody.velocity.x += movement * dt.asSeconds();
         }
-    	
-
-    	//Reduce velocity over time
-        if (playerBody.velocity.x > 0.0f || playerBody.velocity.x < 0.0f)
-        {
-            playerBody.velocity.x += (0.0f - playerBody.velocity.x) * (dt.asSeconds() * 2.0f);
-        }
 
     	//Set player jump
     	const auto jump = (up ? 1.0f : 0.0f) * PLAYER_JUMP_FORCE;
         if(playerCharacter.isGrounded)
         {
-            playerBody.velocity.y += jump;
+            playerBody.velocity.y = jump;
             playerCharacter.isGrounded = false;
         }
 
         //Set player AnimationState
         if(!playerCharacter.isShooting)
         {
-            if (playerBody.position.y <= -5.0f)
+            if (playerBody.position.y <= LOWER_LIMIT)
             {
                 playerCharacter.isGrounded = true;
                 playerCharacter.animationState = AnimationState::IDLE;

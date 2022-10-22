@@ -15,46 +15,49 @@
 
 namespace game
 {
-/**
- * \brief PlayerNumber is a type used to define the number of the player.
- * Starting from 0 to maxPlayerNmb
- */
-using PlayerNumber = std::uint8_t;
-/**
- * \brief INVALID_PLAYER is an integer constant that defines an invalid player number.
- */
-constexpr auto INVALID_PLAYER = std::numeric_limits<PlayerNumber>::max();
-/**
- * \brief ClientId is a type used to define the client identification.
- * It is given by the server to clients.
- */
-enum class ClientId : std::uint16_t {};
-constexpr auto INVALID_CLIENT_ID = ClientId{ 0 };
-using Frame = std::uint32_t;
-/**
- * \brief mmaxPlayerNmb is a integer constant that defines the maximum number of player per game
- */
-constexpr std::uint32_t MAX_PLAYER_NMB = 2;
-constexpr short PLAYER_HEALTH = 3;
-constexpr float PLAYER_SPEED = 5.0f;
-constexpr float PLAYER_JUMP_FORCE = 1.0f;
-constexpr float PLAYER_SHOOTING_PERIOD = 1.0f;
-constexpr float PLAYER_INVINCIBILITY_PERIOD = 1.5f;
-constexpr core::Vec2f PLAYER_SCALE{ 5.0f,5.0f };
-constexpr float INVINCIBILITY_FLASH_PERIOD = 0.5f;
-constexpr float ANIMATION_PERIOD = 0.25f;
+    /**
+     * \brief PlayerNumber is a type used to define the number of the player.
+     * Starting from 0 to maxPlayerNmb
+     */
+    using PlayerNumber = std::uint8_t;
+    /**
+     * \brief INVALID_PLAYER is an integer constant that defines an invalid player number.
+     */
+    constexpr auto INVALID_PLAYER = std::numeric_limits<PlayerNumber>::max();
+    /**
+     * \brief ClientId is a type used to define the client identification.
+     * It is given by the server to clients.
+     */
+    enum class ClientId : std::uint16_t {};
+    constexpr auto INVALID_CLIENT_ID = ClientId{ 0 };
+    using Frame = std::uint32_t;
+    /**
+     * \brief mmaxPlayerNmb is a integer constant that defines the maximum number of player per game
+     */
+    constexpr std::uint32_t MAX_PLAYER_NMB = 2;
+    constexpr short PLAYER_HEALTH = 3;
+    constexpr float PLAYER_SPEED = 5.0f;
+    constexpr float PLAYER_JUMP_FORCE = 10.0f;
+    constexpr float PLAYER_SHOOTING_PERIOD = 1.0f;
+    constexpr float PLAYER_INVINCIBILITY_PERIOD = 1.5f;
+    constexpr core::Vec2f PLAYER_SCALE{ 5.0f,5.0f };
+    constexpr float INVINCIBILITY_FLASH_PERIOD = 0.5f;
+    constexpr float ANIMATION_PERIOD = 0.25f;
 
-constexpr float BULLET_SPEED = 5.0f;
-constexpr float BULLET_SCALE = 2.0f;
-constexpr float BULLET_PERIOD = 3.0f;
-constexpr float BULLET_ROTATION_SPEED = 500.0f;
+    constexpr float BULLET_SPEED = 5.0f;
+    constexpr float BULLET_SCALE = 2.0f;
+    constexpr float BULLET_PERIOD = 3.0f;
+    constexpr float BULLET_ROTATION_SPEED = 500.0f;
 
-constexpr  float GRAVITY = -9.81f;
+    constexpr  float GRAVITY = -9.81f;
 
-constexpr float UPPER_LIMIT = 8.0f;
-constexpr float RIGHT_LIMIT = 10.0f;
-constexpr float LOWER_LIMIT = -7.0f;
-constexpr float LEFT_LIMIT = -10.0f;
+    constexpr float UPPER_LIMIT = 8.0f;
+    constexpr float RIGHT_LIMIT = 10.0f;
+    constexpr float LOWER_LIMIT = -7.0f;
+    constexpr float LEFT_LIMIT = -10.0f;
+
+    constexpr core::Color FLOOR_COLOR = core::Color(125, 180, 0, 255);
+
 
 /**
  * \brief windowBufferSize is the size of input stored by a client. 5 seconds of frame at 50 fps
@@ -101,12 +104,13 @@ constexpr std::array<core::Vec2f, std::max(4u, MAX_PLAYER_NMB)> SPAWN_DIRECTION
 
 enum class ComponentType : core::EntityMask
 {
-    PLAYER_CHARACTER = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE),
-    BULLET = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 1u,
-    DIRECTION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 2u,
-    ANIMATION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 3u,
-    DESTROYED = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 4u,
-    BOX_COLLIDER = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) <<5u
+    BOX_COLLIDER = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE),
+    DIRECTION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 1u,
+    PLAYER_CHARACTER = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE)<< 2u,
+    BULLET = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 3u,
+    ANIMATION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 4u,
+    SOUND = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 5u,
+    DESTROYED = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 6u
 };
 
 /**

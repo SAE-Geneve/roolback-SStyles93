@@ -7,14 +7,15 @@
 #include <SFML/Graphics/Text.hpp>
 
 #include "game_globals.h"
-#include "rollback_manager.h"
 #include "animation_manager.h"
 #include "engine/entity.h"
-#include "graphics/graphics.h"
-#include "graphics/sprite.h"
 #include "engine/system.h"
 #include "engine/transform.h"
+#include "graphics/graphics.h"
+#include "graphics/sprite.h"
 #include "network/packet_type.h"
+#include "rollback_manager.h"
+#include "sound_manager.h"
 
 namespace game
 {
@@ -110,9 +111,10 @@ protected:
 
     AnimationManager animationManager_;
     sf::Texture bulletTexture_{};
-
 	sf::Texture wallTexture_{};
     std::vector<sf::Texture> backgroundTextures_{};
+
+    SoundManager soundManager_;
 
     sf::Font font_;
     sf::Text textRenderer_;

@@ -105,7 +105,8 @@ ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterfac
 	GameManager(),
 	packetSenderInterface_(packetSenderInterface),
 	spriteManager_(entityManager_, transformManager_),
-	animationManager_(entityManager_, spriteManager_, *this)
+	animationManager_(entityManager_, spriteManager_, *this),
+	soundManager_(entityManager_, *this)
 {
 }
 void ClientGameManager::Begin()
@@ -119,27 +120,28 @@ void ClientGameManager::Begin()
 		core::LogError("Could not load font");
 	}
 	textRenderer_.setFont(font_);
-
+	
+	//load Environment elements
 	LoadBackground("background");
-
 	if(!wallTexture_.loadFromFile("data/sprites/wall.png"))
 	{
 		core::LogError("Could not wall sprite");
 	}
+	CreateBackground();
 
+	//load PlayerCharacter Textures
 	animationManager_.LoadTexture("cat_idle", animationManager_.catIdle);
 	animationManager_.LoadTexture("cat_walk", animationManager_.catWalk);
 	animationManager_.LoadTexture("cat_jump", animationManager_.catJump);
 	animationManager_.LoadTexture("cat_shoot", animationManager_.catShoot);
-
-	//load textures
 	if (!bulletTexture_.loadFromFile("data/sprites/bullet.png"))
 	{
 		core::LogError("Could not load bullet sprite");
 	}
 
-	CreateBackground();
-
+	//load sounds
+	soundManager_.LoadSound("cat_hiss", soundManager_.catHissSound);
+	soundManager_.LoadSound("cat_jump", soundManager_.catJumpSound);
 }
 void ClientGameManager::Update(sf::Time dt)
 {
@@ -185,6 +187,7 @@ void ClientGameManager::Update(sf::Time dt)
 				}
 				//Updates the animations
 				animationManager_.UpdateEntity(entity, player.animationState, dt);
+				soundManager_.PlaySound(entity);
 
 				transformManager_.SetPosition(entity, rollbackManager_.GetTransformManager().GetPosition(entity));
 				transformManager_.SetScale(entity, core::Vec2f{ player.lookDir.x * PLAYER_SCALE.x, PLAYER_SCALE.y });
@@ -531,5 +534,14 @@ void ClientGameManager::CreateBackground()
 		transformManager_.SetScale(entity, core::Vec2f(10.0f, 10.0f));
 		spriteManager_.SetOrigin(entity, sf::Vector2f(background.getSize()) / 2.0f);
 	}
+
+	const core::Entity entity = entityManager_.CreateEntity();
+	spriteManager_.AddComponent(entity);
+	spriteManager_.SetTexture(entity, wallTexture_);
+	transformManager_.AddComponent(entity);
+	transformManager_.SetScale(entity, core::Vec2f(40.0f, 5.0f));
+	transformManager_.SetPosition(entity, core::Vec2f(0.0f, -9.0f));
+	spriteManager_.SetOrigin(entity, sf::Vector2f(wallTexture_.getSize()) / 2.0f);
+	spriteManager_.SetColor(entity, FLOOR_COLOR);
 }
 }

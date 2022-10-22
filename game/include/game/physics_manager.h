@@ -106,7 +106,7 @@ class PhysicsManager : public core::DrawInterface
 public:
     explicit PhysicsManager(core::EntityManager& entityManager);
     void ApplyGravityToRigidbodies(sf::Time dt);
-    void LimitPlayerMovement();
+    void LimitPlayerMovement(sf::Time dt);
     void CheckForSphereCollisions();
     void FixedUpdate(sf::Time dt);
 

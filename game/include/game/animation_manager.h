@@ -39,12 +39,12 @@ public:
 
     AnimationManager(core::EntityManager& entityManager, core::SpriteManager& spriteManager, GameManager& gameManager);
 
-    //void LoadTexture(std::string path, std::vector<sf::Texture>& textures) const;
+   
     void LoadTexture(std::string_view path, Animation& animation) const;
-    //void PlayAnimation(core::Entity& entity, const std::vector<sf::Texture>& textures, float speed);
+    
     void PlayAnimation(const core::Entity& entity, Animation& animation, float speed);
-	//void UpdateEntity(sf::Time dt);
-	void UpdateEntity(core::Entity entity, AnimationState animationState, sf::Time dt);
+
+    void UpdateEntity(core::Entity entity, AnimationState animationState, sf::Time dt);
 
     float animationTime_ = 0;
 
