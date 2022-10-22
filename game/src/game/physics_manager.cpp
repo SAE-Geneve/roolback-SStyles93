@@ -38,28 +38,61 @@ bool Box2Circle(BoxCollider myBox, Rigidbody myBody,
 	const float min1Y = myBody.position.y - myBox.extends.y / 2.0f;
 	const float max1Y = myBody.position.y + myBox.extends.y / 2.0f;
 
-	const core::Vec2f distance = otherBody.position - myBody.position;
+	const core::Vec2f direction = otherBody.position - myBody.position;
 
-	if((distance.GetNormalized() * otherCircle.radius).x < min1X &&
-		(distance.GetNormalized() * otherCircle.radius).x > max1X)
+	if((direction.GetNormalized() * otherCircle.radius).x < min1X &&
+		(direction.GetNormalized() * otherCircle.radius).x > max1X)
 	{
 		return false;
 	}
-	if ((distance.GetNormalized() * otherCircle.radius).y < min1Y &&
-		(distance.GetNormalized() * otherCircle.radius).y > max1Y)
+	if ((direction.GetNormalized() * otherCircle.radius).y < min1Y &&
+		(direction.GetNormalized() * otherCircle.radius).y > max1Y)
 	{
 		return false;
 	}
 
-	const float distanceMagnitude = distance.GetMagnitude();
+	const float distanceMagnitude = direction.GetMagnitude();
 	const float radiusSum = myBox.extends.GetMagnitude()/2.0f + otherCircle.radius;
+
+	const float mtvDifference = radiusSum - distanceMagnitude;
+	mtv = direction.GetNormalized() * mtvDifference;
+
+	return (distanceMagnitude <= radiusSum);
+}
+bool Box2Box(BoxCollider myBox, Rigidbody myBody,
+	BoxCollider otherBox, Rigidbody otherBody, 
+	core::Vec2f mtv) 
+{
+	const float min1X = myBody.position.x - myBox.extends.x / 2.0f;
+	const float max1X = myBody.position.x + myBox.extends.x / 2.0f;
+	const float min1Y = myBody.position.y - myBox.extends.y / 2.0f;
+	const float max1Y = myBody.position.y + myBox.extends.y / 2.0f;
+
+	const float min2X = otherBody.position.x - otherBox.extends.x / 2.0f;
+	const float max2X = otherBody.position.x + otherBox.extends.x / 2.0f;
+	const float min2Y = otherBody.position.y - otherBox.extends.y / 2.0f;
+	const float max2Y = otherBody.position.y + otherBox.extends.y / 2.0f;
+
+	if ((min1X < min2X) &&
+		(max1X > max2X))
+	{
+		return false;
+	}
+	if ((min1Y < min2Y) &&
+		(max1Y > max2Y))
+	{
+		return false;
+	}
+
+	const core::Vec2f distance = otherBody.position - myBody.position;
+	const float distanceMagnitude = distance.GetMagnitude();
+	const float radiusSum = myBox.extends.GetMagnitude() / 2.0f + otherBox.extends.GetMagnitude() / 2.0f;
 
 	const float mtvDifference = radiusSum - distanceMagnitude;
 	mtv = distance.GetNormalized() * mtvDifference;
 
-	return (distanceMagnitude <= radiusSum);
+	return true;
 }
-
 /**
  * \brief Checks for overlapping between two spheres
  * \param myCircle The first circle to evaluate
@@ -169,7 +202,7 @@ void PhysicsManager::LimitPlayerMovement()
 		//Check for sphere collisions
 		if (!entityManager_.HasComponent(entity,
 			static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
-			static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
+			static_cast<core::EntityMask>(ComponentType::PLAYER_CHARACTER)) ||
 			entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 			continue;
 
@@ -205,14 +238,14 @@ void PhysicsManager::CheckForCircleCollisions()
 		//Check for circle collisions
 		if (!entityManager_.HasComponent(entity,
 			static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
-			static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
+			static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)) ||
 			entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 			continue;
 
 		for (core::Entity otherEntity = entity + 1; otherEntity < entityManager_.GetEntitiesSize(); otherEntity++)
 		{
 			if (!entityManager_.HasComponent(otherEntity,
-				static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) | static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
+				static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) | static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)) ||
 				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 				continue;
 			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(entity);
@@ -239,13 +272,14 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 	LimitPlayerMovement();
 	CheckForCircleCollisions();
 
+
 	//Circle/box collisions
 	for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 	{
 		//Check for mixed collisions
 		if (!entityManager_.HasComponent(entity,
 			static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
-			static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
+			static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)) ||
 			entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 			continue;
 		for (core::Entity otherEntity = entity + 1; otherEntity < entityManager_.GetEntitiesSize(); otherEntity++)
@@ -260,7 +294,7 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(otherEntity);
 			const BoxCollider& box = boxColliderManager_.GetComponent(otherEntity);
 
-			if (Box2Circle(box, rigidbody1, circle, rigidbody2, mtv_))
+			if (Box2Circle(box, rigidbody2, circle, rigidbody1, mtv_))
 			{
 				onTriggerAction_.Execute(entity, otherEntity);
 			}
@@ -278,7 +312,7 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 		for (core::Entity otherEntity = entity + 1; otherEntity < entityManager_.GetEntitiesSize(); otherEntity++)
 		{
 			if (!entityManager_.HasComponent(otherEntity,
-				static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) | static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
+				static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) | static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)) ||
 				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 				continue;
 			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(otherEntity);
@@ -287,12 +321,41 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(entity);
 			const BoxCollider& box = boxColliderManager_.GetComponent(entity);
 
-			if (Box2Circle(box, rigidbody1, circle, rigidbody2, mtv_))
+			if (Box2Circle(box, rigidbody2, circle, rigidbody1, mtv_))
 			{
 				onTriggerAction_.Execute(entity, otherEntity);
 			}
 		}
 	}
+
+	//for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
+	//{
+	//	//Check for circle collisions
+	//	if (!entityManager_.HasComponent(entity,
+	//		static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
+	//		static_cast<core::EntityMask>(ComponentType::BOX_COLLIDER)) ||
+	//		entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
+	//		continue;
+
+	//	for (core::Entity otherEntity = entity + 1; otherEntity < entityManager_.GetEntitiesSize(); otherEntity++)
+	//	{
+	//		if (!entityManager_.HasComponent(otherEntity,
+	//			static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
+	//			static_cast<core::EntityMask>(ComponentType::BOX_COLLIDER)) ||
+	//			entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
+	//			continue;
+	//		const Rigidbody rigidbody1 = rigidbodyManager_.GetComponent(entity);
+	//		const BoxCollider box1 = boxColliderManager_.GetComponent(entity);
+
+	//		const Rigidbody rigidbody2 = rigidbodyManager_.GetComponent(otherEntity);
+	//		const BoxCollider box2 = boxColliderManager_.GetComponent(otherEntity);
+
+	//		if (Box2Box(box1, rigidbody1, box2, rigidbody2, mtv_))
+	//		{
+	//			onTriggerAction_.Execute(entity, otherEntity);
+	//		}
+	//	}
+	//}
 }
 
 void PhysicsManager::AddRigidbody(core::Entity entity)
@@ -359,7 +422,7 @@ void PhysicsManager::Draw(sf::RenderTarget& renderTarget)
 	{
 		if (!entityManager_.HasComponent(entity,
 			static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
-			static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
+			static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)) ||
 			entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 			continue;
 		const auto& [radius, isTrigger] = circleColliderManager_.GetComponent(entity);

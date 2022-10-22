@@ -91,7 +91,7 @@ public:
 /**
  * \brief BoxManager is a ComponentManager that holds all the Box in the world.
  */
-class CircleColliderManager : public core::ComponentManager<CircleCollider, static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)>
+class CircleColliderManager : public core::ComponentManager<CircleCollider, static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)>
 {
 public:
     using ComponentManager::ComponentManager;

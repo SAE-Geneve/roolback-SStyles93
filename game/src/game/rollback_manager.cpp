@@ -286,8 +286,11 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
     playerBody.position = position;
     //playerBody.bounciness = 0.0f;
 
-    CircleCollider playerSphere;
-    playerSphere.radius = 0.5f;
+    CircleCollider playerCircle;
+    playerCircle.radius = 0.5f;
+
+   /* BoxCollider playerBox;
+    playerBox.extends = core::Vec2f::one() * 0.5f;*/
 
     PlayerCharacter playerCharacter;
     playerCharacter.playerNumber = playerNumber;
@@ -300,7 +303,10 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
     currentPhysicsManager_.AddRigidbody(entity);
     currentPhysicsManager_.SetRigidbody(entity, playerBody);
     currentPhysicsManager_.AddCircle(entity);
-    currentPhysicsManager_.SetCircle(entity, playerSphere);
+    currentPhysicsManager_.SetCircle(entity, playerCircle);
+
+    /*currentPhysicsManager_.AddBox(entity);
+    currentPhysicsManager_.SetBox(entity, playerBox);*/
 
     currentTransformManager_.AddComponent(entity);
 	currentTransformManager_.SetPosition(entity, position);
@@ -313,7 +319,10 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
     lastValidatePhysicsManager_.AddRigidbody(entity);
     lastValidatePhysicsManager_.SetRigidbody(entity, playerBody);
     lastValidatePhysicsManager_.AddCircle(entity);
-    lastValidatePhysicsManager_.SetCircle(entity, playerSphere);
+    lastValidatePhysicsManager_.SetCircle(entity, playerCircle);
+
+    /*lastValidatePhysicsManager_.AddBox(entity);
+    lastValidatePhysicsManager_.SetBox(entity, playerBox);*/
 }
 
 PlayerInput RollbackManager::GetInputAtFrame(PlayerNumber playerNumber, Frame frame) const
@@ -432,7 +441,11 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
     {
         ManagePlatformCollision(entity2, entity1);
     }
-    
+    //if (entityManager_.HasComponent(entity1, static_cast<core::EntityMask>(ComponentType::BOX_COLLIDER)) &&
+    //    entityManager_.HasComponent(entity2, static_cast<core::EntityMask>(ComponentType::BOX_COLLIDER)))
+    //{
+    //    ManagePlatformCollision(entity1, entity2);
+    //}
 }
 
 void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity, core::Vec2f position, core::Vec2f velocity)
@@ -476,15 +489,15 @@ void RollbackManager::SpawnWall(core::Entity entity, core::Vec2f position)
     currentPhysicsManager_.AddBox(entity);
     currentPhysicsManager_.SetBox(entity, wallCollider);
 
-    lastValidatePhysicsManager_.AddRigidbody(entity);
-    lastValidatePhysicsManager_.SetRigidbody(entity, wallBody);
-    lastValidatePhysicsManager_.AddBox(entity);
-    lastValidatePhysicsManager_.SetBox(entity, wallCollider);
-
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
     currentTransformManager_.SetRotation(entity, core::Degree{ 0.0f });
     currentTransformManager_.SetScale(entity, WALL_SIZE * WALL_SCALE);
+
+    lastValidatePhysicsManager_.AddRigidbody(entity);
+    lastValidatePhysicsManager_.SetRigidbody(entity, wallBody);
+    lastValidatePhysicsManager_.AddBox(entity);
+    lastValidatePhysicsManager_.SetBox(entity, wallCollider);
 }
 
 void RollbackManager::DestroyEntity(core::Entity entity)
