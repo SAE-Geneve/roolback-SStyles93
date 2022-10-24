@@ -341,8 +341,8 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         auto player2Rigidbody = currentPhysicsManager_.GetRigidbody(entity2);
         auto mtv = currentPhysicsManager_.GetMTV();
 
-        game::PhysicsManager::SolveCollision(player1Rigidbody, player2Rigidbody);
-        game::PhysicsManager::SolveMTV(player1Rigidbody, player2Rigidbody, mtv);
+        PhysicsManager::SolveCollision(player1Rigidbody, player2Rigidbody);
+        PhysicsManager::SolveMTV(player1Rigidbody, player2Rigidbody, mtv);
 
         currentPhysicsManager_.SetRigidbody(entity1, player1Rigidbody);
         currentPhysicsManager_.SetRigidbody(entity2, player2Rigidbody);
@@ -377,8 +377,8 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         auto bullet2Rigidbody = currentPhysicsManager_.GetRigidbody(entity2);
         auto mtv = currentPhysicsManager_.GetMTV();
 
-        game::PhysicsManager::SolveCollision(bullet1Rigidbody, bullet2Rigidbody);
-        game::PhysicsManager::SolveMTV(bullet1Rigidbody, bullet2Rigidbody, mtv);
+        PhysicsManager::SolveCollision(bullet1Rigidbody, bullet2Rigidbody);
+        PhysicsManager::SolveMTV(bullet1Rigidbody, bullet2Rigidbody, mtv);
 
         currentPhysicsManager_.SetRigidbody(entity1, bullet1Rigidbody);
         currentPhysicsManager_.SetRigidbody(entity2, bullet2Rigidbody);
@@ -394,8 +394,8 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         auto wallRigidbody = currentPhysicsManager_.GetRigidbody(entity2);
         auto mtv = currentPhysicsManager_.GetMTV();
 
-        game::PhysicsManager::SolveCollision(playerRigidbody, wallRigidbody);
-        game::PhysicsManager::SolveMTV(playerRigidbody, wallRigidbody, mtv);
+        PhysicsManager::SolveCollision(playerRigidbody, wallRigidbody);
+        PhysicsManager::SolveMTV(playerRigidbody, wallRigidbody, mtv);
 
         currentPhysicsManager_.SetRigidbody(entity1, playerRigidbody);
         currentPhysicsManager_.SetRigidbody(entity2, wallRigidbody);

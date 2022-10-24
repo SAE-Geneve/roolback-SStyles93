@@ -33,66 +33,71 @@ bool Box2Circle(BoxCollider myBox, Rigidbody myBody,
 	core::Vec2f& mtv)
 {
 
-	const float min1X = myBody.position.x - myBox.extends.x / 2.0f;
-	const float max1X = myBody.position.x + myBox.extends.x / 2.0f;
-	const float min1Y = myBody.position.y - myBox.extends.y / 2.0f;
-	const float max1Y = myBody.position.y + myBox.extends.y / 2.0f;
+	const float min1X = myBody.position.x - myBox.extends.x;
+	const float max1X = myBody.position.x + myBox.extends.x;
+	const float min1Y = myBody.position.y - myBox.extends.y;
+	const float max1Y = myBody.position.y + myBox.extends.y;
 
-	const core::Vec2f direction = otherBody.position - myBody.position;
+	const float min2X = otherBody.position.x - otherCircle.radius;
+	const float max2X = otherBody.position.x + otherCircle.radius;
+	const float min2Y = otherBody.position.y - otherCircle.radius;
+	const float max2Y = otherBody.position.y + otherCircle.radius;
 
-	if((direction.GetNormalized() * otherCircle.radius).x < min1X &&
-		(direction.GetNormalized() * otherCircle.radius).x > max1X)
+	if ((max1X < min2X) ||
+		(min1X > max2X))
 	{
 		return false;
 	}
-	if ((direction.GetNormalized() * otherCircle.radius).y < min1Y &&
-		(direction.GetNormalized() * otherCircle.radius).y > max1Y)
+	if ((max1Y < min2Y) ||
+		(min1Y > max2Y))
 	{
 		return false;
 	}
+	/*const core::Vec2f direction = otherBody.position - myBody.position;
 
 	const float distanceMagnitude = direction.GetMagnitude();
-	const float radiusSum = myBox.extends.GetMagnitude()/2.0f + otherCircle.radius;
+	const float radiusSum = myBox.extends.x /2.0f + otherCircle.radius;
 
 	const float mtvDifference = radiusSum - distanceMagnitude;
 	mtv = direction.GetNormalized() * mtvDifference;
 
-	return (distanceMagnitude <= radiusSum);
-}
-bool Box2Box(BoxCollider myBox, Rigidbody myBody,
-	BoxCollider otherBox, Rigidbody otherBody, 
-	core::Vec2f mtv) 
-{
-	const float min1X = myBody.position.x - myBox.extends.x / 2.0f;
-	const float max1X = myBody.position.x + myBox.extends.x / 2.0f;
-	const float min1Y = myBody.position.y - myBox.extends.y / 2.0f;
-	const float max1Y = myBody.position.y + myBox.extends.y / 2.0f;
-
-	const float min2X = otherBody.position.x - otherBox.extends.x / 2.0f;
-	const float max2X = otherBody.position.x + otherBox.extends.x / 2.0f;
-	const float min2Y = otherBody.position.y - otherBox.extends.y / 2.0f;
-	const float max2Y = otherBody.position.y + otherBox.extends.y / 2.0f;
-
-	if ((min1X < min2X) &&
-		(max1X > max2X))
-	{
-		return false;
-	}
-	if ((min1Y < min2Y) &&
-		(max1Y > max2Y))
-	{
-		return false;
-	}
-
-	const core::Vec2f distance = otherBody.position - myBody.position;
-	const float distanceMagnitude = distance.GetMagnitude();
-	const float radiusSum = myBox.extends.GetMagnitude() / 2.0f + otherBox.extends.GetMagnitude() / 2.0f;
-
-	const float mtvDifference = radiusSum - distanceMagnitude;
-	mtv = distance.GetNormalized() * mtvDifference;
-
+	return (distanceMagnitude <= radiusSum);*/
 	return true;
 }
+//bool Box2Box(BoxCollider myBox, Rigidbody myBody,
+//	BoxCollider otherBox, Rigidbody otherBody, 
+//	core::Vec2f mtv) 
+//{
+//	const float min1X = myBody.position.x - myBox.extends.x;
+//	const float max1X = myBody.position.x + myBox.extends.x;
+//	const float min1Y = myBody.position.y - myBox.extends.y;
+//	const float max1Y = myBody.position.y + myBox.extends.y;
+//
+//	const float min2X = otherBody.position.x - otherBox.extends.x;
+//	const float max2X = otherBody.position.x + otherBox.extends.x;
+//	const float min2Y = otherBody.position.y - otherBox.extends.y;
+//	const float max2Y = otherBody.position.y + otherBox.extends.y;
+//
+//	if ((max1X < min2X) ||
+//		(min1X > max2X))
+//	{
+//		return false;
+//	}
+//	if ((max1Y < min2Y) ||
+//		(min1Y > max2Y))
+//	{
+//		return false;
+//	}
+//
+//	const core::Vec2f distance = otherBody.position - myBody.position;
+//	const float distanceMagnitude = distance.GetMagnitude();
+//	const float radiusSum = myBox.extends.GetMagnitude() / 2.0f + otherBox.extends.GetMagnitude() / 2.0f;
+//
+//	const float mtvDifference = radiusSum - distanceMagnitude;
+//	mtv = distance.GetNormalized() * mtvDifference;
+//
+//	return true;
+//}
 /**
  * \brief Checks for overlapping between two spheres
  * \param myCircle The first circle to evaluate
@@ -297,6 +302,7 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 			if (Box2Circle(box, rigidbody2, circle, rigidbody1, mtv_))
 			{
 				onTriggerAction_.Execute(entity, otherEntity);
+				//core::LogDebug("Collision");
 			}
 		}
 	}
@@ -324,6 +330,7 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 			if (Box2Circle(box, rigidbody2, circle, rigidbody1, mtv_))
 			{
 				onTriggerAction_.Execute(entity, otherEntity);
+				//core::LogDebug("Collision");
 			}
 		}
 	}
