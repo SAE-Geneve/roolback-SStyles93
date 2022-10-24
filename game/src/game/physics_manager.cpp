@@ -17,30 +17,6 @@ PhysicsManager::PhysicsManager(core::EntityManager& entityManager) :
 	sphereColliderManager_(entityManager){}
 
 /**
- * \brief Checks for overlapping between a box and a sphere
- * \param myBox The box to evaluate
- * \param myBody The first rigidbody to evaluate
- * \param otherSphere The sphere to evaluate
- * \param otherBody The second rigidbody to evaluate
- * \param mtv The minimum translation vector used in collision solving
- * \return True if two spheres are overlapping
- */
-bool IsOverlappingBox(BoxCollider myBox, Rigidbody myBody,
-	SphereCollider otherSphere, Rigidbody otherBody,
-	core::Vec2f& mtv)
-{
-	const  core::Vec2f distance = otherBody.position - myBody.position;
-
-	const float distanceMagnitude = distance.GetMagnitude();
-	const float radiusSum = myBox.extends.GetMagnitude() + otherSphere.radius;
-
-	const float mtvDifference = radiusSum - distanceMagnitude;
-	mtv = distance.GetNormalized() * mtvDifference;
-
-	return (distanceMagnitude <= radiusSum);
-}
-
-/**
  * \brief Checks for overlapping between two spheres
  * \param mySphere The first sphere to evaluate
  * \param myBody The first rigidbody to evaluate
