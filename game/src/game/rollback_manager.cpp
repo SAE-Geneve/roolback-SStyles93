@@ -286,8 +286,8 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
     playerBody.position = position;
     //playerBody.bounciness = 0.0f;
 
-    SphereCollider playerSphere;
-    playerSphere.radius = 0.5f;
+    CircleCollider playerCircle;
+    playerCircle.radius = 0.5f;
 
     PlayerCharacter playerCharacter;
     playerCharacter.playerNumber = playerNumber;
@@ -299,16 +299,16 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
 
     currentPhysicsManager_.AddRigidbody(entity);
     currentPhysicsManager_.SetRigidbody(entity, playerBody);
-    currentPhysicsManager_.AddSphere(entity);
-    currentPhysicsManager_.SetSphere(entity, playerSphere);
+    currentPhysicsManager_.AddCircle(entity);
+    currentPhysicsManager_.SetCircle(entity, playerCircle);
 
     lastValidatePlayerManager_.AddComponent(entity);
     lastValidatePlayerManager_.SetComponent(entity, playerCharacter);
 
     lastValidatePhysicsManager_.AddRigidbody(entity);
     lastValidatePhysicsManager_.SetRigidbody(entity, playerBody);
-    lastValidatePhysicsManager_.AddSphere(entity);
-    lastValidatePhysicsManager_.SetSphere(entity, playerSphere);
+    lastValidatePhysicsManager_.AddCircle(entity);
+    lastValidatePhysicsManager_.SetCircle(entity, playerCircle);
 
     currentTransformManager_.AddComponent(entity);
 	currentTransformManager_.SetPosition(entity, position);
@@ -417,7 +417,7 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
     bulletBody.position = position;
     bulletBody.velocity = velocity;
     bulletBody.gravityScale = 0.0f;
-    SphereCollider bulletSphere;
+    CircleCollider bulletSphere;
     bulletSphere.radius = 0.25f * BULLET_SCALE;
 
     currentBulletManager_.AddComponent(entity);
@@ -425,8 +425,8 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
 
     currentPhysicsManager_.AddRigidbody(entity);
     currentPhysicsManager_.SetRigidbody(entity, bulletBody);
-    currentPhysicsManager_.AddSphere(entity);
-    currentPhysicsManager_.SetSphere(entity, bulletSphere);
+    currentPhysicsManager_.AddCircle(entity);
+    currentPhysicsManager_.SetCircle(entity, bulletSphere);
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);

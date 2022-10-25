@@ -27,7 +27,6 @@ struct Animation
 {
     int textureIdx = 0;
     std::vector<sf::Texture> textures{};
-    AnimationState  animationState = AnimationState::NONE;
 };
 /**
  * \brief AnimationManager is a ComponentManager that holds all the animations in one place.

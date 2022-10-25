@@ -32,7 +32,7 @@ struct BoxCollider
 /**
  * \brief SphereCollider is a spherical shape collider used in the physics engine
  */
-struct SphereCollider
+struct CircleCollider
 {
     float radius = 0.5f;
     bool isTrigger = false;
@@ -49,11 +49,9 @@ struct Rigidbody
     core::Degree angularVelocity = core::Degree(0.0f);
 
 	core::Vec2f acceleration = core::Vec2f::zero();
-    core::Vec2f force = core::Vec2f::zero();
 
     float bounciness = 1.0f;
     float gravityScale = 1.0f;
-    float mass = 0.0f;
 
     BodyType bodyType = BodyType::DYNAMIC;
 };
@@ -91,7 +89,7 @@ public:
 /**
  * \brief BoxManager is a ComponentManager that holds all the Box in the world.
  */
-class SphereColliderManager : public core::ComponentManager<SphereCollider, static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)>
+class CircleColliderManager : public core::ComponentManager<CircleCollider, static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)>
 {
 public:
     using ComponentManager::ComponentManager;
@@ -107,16 +105,16 @@ public:
     explicit PhysicsManager(core::EntityManager& entityManager);
     void ApplyGravityToRigidbodies(sf::Time dt);
     void LimitPlayerMovement(sf::Time dt);
-    void CheckForSphereCollisions();
+    void CheckForCircleCollisions();
     void FixedUpdate(sf::Time dt);
 
     void SetRigidbody(core::Entity entity, const Rigidbody& rigidbody);
     void AddRigidbody(core::Entity entity);
     [[nodiscard]] const Rigidbody& GetRigidbody(core::Entity entity) const;
 
-    void AddSphere(core::Entity entity);
-    void SetSphere(core::Entity entity, const SphereCollider& sphere);
-    [[nodiscard]] const SphereCollider& GetSphere(core::Entity entity) const;
+    void AddCircle(core::Entity entity);
+    void SetCircle(core::Entity entity, const CircleCollider& sphere);
+    [[nodiscard]] const CircleCollider& GetCircle(core::Entity entity) const;
 
     /**
      * \brief RegisterTriggerListener is a method that stores an OnTriggerInterface in the PhysicsManager that will call the OnTrigger method in case of a trigger.
@@ -137,7 +135,7 @@ private:
 
     core::EntityManager& entityManager_;
     RigidbodyManager rigidbodyManager_;
-    SphereColliderManager sphereColliderManager_;
+    CircleColliderManager circleColliderManager_;
     core::Action<core::Entity, core::Entity> onTriggerAction_;
     //Used for debug
     sf::Vector2f center_{};

@@ -134,6 +134,7 @@ void ClientGameManager::Begin()
 	animationManager_.LoadTexture("cat_walk", animationManager_.catWalk);
 	animationManager_.LoadTexture("cat_jump", animationManager_.catJump);
 	animationManager_.LoadTexture("cat_shoot", animationManager_.catShoot);
+
 	if (!bulletTexture_.loadFromFile("data/sprites/bullet.png"))
 	{
 		core::LogError("Could not load bullet sprite");
@@ -187,6 +188,7 @@ void ClientGameManager::Update(sf::Time dt)
 				}
 				//Updates the animations
 				animationManager_.UpdateEntity(entity, player.animationState, dt);
+				//Plays the correct sound on the entitiy according to its state
 				soundManager_.PlaySound(entity);
 
 				transformManager_.SetPosition(entity, rollbackManager_.GetTransformManager().GetPosition(entity));

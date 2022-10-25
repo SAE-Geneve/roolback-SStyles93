@@ -14,26 +14,26 @@ namespace game
 
 PhysicsManager::PhysicsManager(core::EntityManager& entityManager) :
 	entityManager_(entityManager), rigidbodyManager_(entityManager),
-	sphereColliderManager_(entityManager){}
+	circleColliderManager_(entityManager){}
 
 /**
  * \brief Checks for overlapping between two spheres
- * \param mySphere The first sphere to evaluate
+ * \param myCircle The first sphere to evaluate
  * \param myBody The first rigidbody to evaluate
- * \param otherSphere The second  sphere to evaluate
+ * \param otherCircle The second  sphere to evaluate
  * \param otherBody The second rigidbody to evaluate
  * \param mtv The minimum translation vector used in collision solving
  * \return True if two spheres are overlapping
  */
-bool IsOverlappingSphere(
-	SphereCollider mySphere, Rigidbody myBody,
-	SphereCollider otherSphere, Rigidbody otherBody,
+bool IsOverlappingCircle(
+	CircleCollider myCircle, Rigidbody myBody,
+	CircleCollider otherCircle, Rigidbody otherBody,
 	core::Vec2f& mtv)
 {
 	const  core::Vec2f distance = otherBody.position - myBody.position;
 
 	const float distanceMagnitude = distance.GetMagnitude();
-	const float radiusSum = mySphere.radius + otherSphere.radius;
+	const float radiusSum = myCircle.radius + otherCircle.radius;
 
 	const float mtvDifference = radiusSum - distanceMagnitude;
 	mtv = distance.GetNormalized() * mtvDifference;
@@ -153,30 +153,30 @@ void PhysicsManager::LimitPlayerMovement(sf::Time dt)
 	}
 }
 
-void PhysicsManager::CheckForSphereCollisions()
+void PhysicsManager::CheckForCircleCollisions()
 {
 	for (core::Entity entity = 0; entity < entityManager_.GetEntitiesSize(); entity++)
 	{
 		//Check for sphere collisions
 		if (!entityManager_.HasComponent(entity,
 			static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
-			static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
+			static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)) ||
 			entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 			continue;
 
 		for (core::Entity otherEntity = entity + 1; otherEntity < entityManager_.GetEntitiesSize(); otherEntity++)
 		{
 			if (!entityManager_.HasComponent(otherEntity,
-				static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) | static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
+				static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) | static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)) ||
 				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 				continue;
 			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(entity);
-			const SphereCollider& sphere1 = sphereColliderManager_.GetComponent(entity);
+			const CircleCollider& sphere1 = circleColliderManager_.GetComponent(entity);
 
 			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(otherEntity);
-			const SphereCollider& sphere2 = sphereColliderManager_.GetComponent(otherEntity);
+			const CircleCollider& sphere2 = circleColliderManager_.GetComponent(otherEntity);
 
-			if (IsOverlappingSphere(sphere1, rigidbody1, sphere2, rigidbody2, mtv_))
+			if (IsOverlappingCircle(sphere1, rigidbody1, sphere2, rigidbody2, mtv_))
 			{
 				onTriggerAction_.Execute(entity, otherEntity);
 			}
@@ -193,7 +193,7 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 
 	ApplyGravityToRigidbodies(dt);
 	LimitPlayerMovement(dt);
-	CheckForSphereCollisions();
+	CheckForCircleCollisions();
 }
 
 void PhysicsManager::AddRigidbody(core::Entity entity)
@@ -211,19 +211,19 @@ const Rigidbody& PhysicsManager::GetRigidbody(core::Entity entity) const
 	return rigidbodyManager_.GetComponent(entity);
 }
 
-void PhysicsManager::AddSphere(core::Entity entity)
+void PhysicsManager::AddCircle(core::Entity entity)
 {
-	sphereColliderManager_.AddComponent(entity);
+	circleColliderManager_.AddComponent(entity);
 }
 
-void PhysicsManager::SetSphere(core::Entity entity, const SphereCollider& sphere)
+void PhysicsManager::SetCircle(core::Entity entity, const CircleCollider& sphere)
 {
-	sphereColliderManager_.SetComponent(entity, sphere);
+	circleColliderManager_.SetComponent(entity, sphere);
 }
 
-const SphereCollider& PhysicsManager::GetSphere(core::Entity entity) const
+const CircleCollider& PhysicsManager::GetCircle(core::Entity entity) const
 {
-	return sphereColliderManager_.GetComponent(entity);
+	return circleColliderManager_.GetComponent(entity);
 }
 
 void PhysicsManager::RegisterTriggerListener(OnTriggerInterface& onTriggerInterface)
@@ -235,7 +235,7 @@ void PhysicsManager::RegisterTriggerListener(OnTriggerInterface& onTriggerInterf
 void PhysicsManager::CopyAllComponents(const PhysicsManager& physicsManager)
 {
 	rigidbodyManager_.CopyAllComponents(physicsManager.rigidbodyManager_.GetAllComponents());
-	sphereColliderManager_.CopyAllComponents(physicsManager.sphereColliderManager_.GetAllComponents());
+	circleColliderManager_.CopyAllComponents(physicsManager.circleColliderManager_.GetAllComponents());
 }
 
 void PhysicsManager::Draw(sf::RenderTarget& renderTarget)
@@ -244,10 +244,10 @@ void PhysicsManager::Draw(sf::RenderTarget& renderTarget)
 	{
 		if (!entityManager_.HasComponent(entity,
 			static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) |
-			static_cast<core::EntityMask>(core::ComponentType::SPHERE_COLLIDER)) ||
+			static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)) ||
 			entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 			continue;
-		const auto& [radius, isTrigger] = sphereColliderManager_.GetComponent(entity);
+		const auto& [radius, isTrigger] = circleColliderManager_.GetComponent(entity);
 		const auto& sphereBody = rigidbodyManager_.GetComponent(entity);
 		sf::CircleShape circleShape;
 		circleShape.setFillColor(core::Color::transparent());

@@ -6,12 +6,7 @@ namespace game
 {
 AnimationManager::AnimationManager(core::EntityManager& entityManager, core::SpriteManager& spriteManager, GameManager& gameManager) :
 	ComponentManager(entityManager), spriteManager_(spriteManager), gameManager_(gameManager)
-{
-	catIdle.animationState = AnimationState::IDLE;
-	catWalk.animationState = AnimationState::WALK;
-	catJump.animationState = AnimationState::JUMP;
-	catShoot.animationState = AnimationState::SHOOT;
-}
+{}
 
 void AnimationManager::LoadTexture(const std::string_view path, Animation& animation) const
 {

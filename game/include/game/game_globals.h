@@ -40,8 +40,8 @@ namespace game
     constexpr float PLAYER_JUMP_FORCE = 10.0f;
     constexpr float PLAYER_SHOOTING_PERIOD = 1.0f;
     constexpr float PLAYER_INVINCIBILITY_PERIOD = 1.5f;
-    constexpr core::Vec2f PLAYER_SCALE{ 5.0f,5.0f };
     constexpr float INVINCIBILITY_FLASH_PERIOD = 0.5f;
+    constexpr core::Vec2f PLAYER_SCALE{ 5.0f,5.0f };
     constexpr float ANIMATION_PERIOD = 0.25f;
 
     constexpr float BULLET_SPEED = 5.0f;
@@ -82,8 +82,8 @@ constexpr std::array<core::Color, std::max(4u, MAX_PLAYER_NMB)> PLAYER_COLORS
 {
     core::Color::red(),
     core::Color::cyan(),
-    core::Color::blue(),
-    core::Color::yellow()
+    core::Color::yellow(),
+    core::Color::blue()
 };
 
 constexpr std::array<core::Vec2f, std::max(4u, MAX_PLAYER_NMB)> SPAWN_POSITIONS
