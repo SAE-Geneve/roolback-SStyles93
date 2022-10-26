@@ -352,9 +352,9 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
             if (playerCharacter.invincibilityTime <= 0.0f)
             {
                 core::LogDebug(fmt::format("Player {} is hit by bullet", playerCharacter.playerNumber));
-                --playerCharacter.health;
+                playerCharacter.health -= bullet.power;
                 playerCharacter.invincibilityTime = PLAYER_INVINCIBILITY_PERIOD;
-                playerRigidbody.velocity.x = bulletRigidbody.velocity.x;
+                playerRigidbody.velocity.x = (1/bulletRigidbody.velocity.x);
             }
             currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
             currentPhysicsManager_.SetRigidbody(playerEntity, playerRigidbody);
@@ -418,10 +418,10 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
     bulletBody.velocity = velocity;
     bulletBody.gravityScale = 0.0f;
     CircleCollider bulletSphere;
-    bulletSphere.radius = 0.25f * BULLET_SCALE;
+    bulletSphere.radius = 0.25f/* * BULLET_SCALE*/;
 
     currentBulletManager_.AddComponent(entity);
-    currentBulletManager_.SetComponent(entity, { BULLET_PERIOD, playerNumber });
+    currentBulletManager_.SetComponent(entity, {  playerNumber, BULLET_PERIOD, 0.0f });
 
     currentPhysicsManager_.AddRigidbody(entity);
     currentPhysicsManager_.SetRigidbody(entity, bulletBody);
@@ -430,7 +430,7 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
-    currentTransformManager_.SetScale(entity, core::Vec2f::one() * BULLET_SCALE);
+    currentTransformManager_.SetScale(entity, core::Vec2f::one()/* * BULLET_SCALE*/);
     currentTransformManager_.SetRotation(entity, core::Degree(0.0f));
 }
 
@@ -449,6 +449,12 @@ void RollbackManager::DestroyEntity(core::Entity entity)
         return;
     }
         entityManager_.AddComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED));
+}
+
+void RollbackManager::SpawnHealthBar(PlayerNumber playerNumber, core::Entity entity)
+{
+    currentTransformManager_.AddComponent(entity);
+    currentTransformManager_.SetScale(entity, HEALTH_BAR_SCALE);
 }
 
 //	void RollbackManager::RespawnPlayer(core::Entity entity)

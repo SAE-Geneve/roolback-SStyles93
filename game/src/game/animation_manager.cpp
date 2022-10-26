@@ -105,7 +105,6 @@ void AnimationManager::PlayAnimation(const core::Entity& entity,Animation& anima
 		break;
 
 	case AnimationState::NONE:
-		core::LogError("PlayAnimation trying to play \"NONE\"");
 		break;
 
 	default:
@@ -135,7 +134,6 @@ void AnimationManager::UpdateEntity(core::Entity entity, AnimationState animatio
 		break;
 
 	case AnimationState::NONE:
-		core::LogError("Animation state \"NONE\"");
 		break;
 
 	default:

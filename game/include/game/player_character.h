@@ -15,7 +15,7 @@ struct PlayerCharacter
 {
     PlayerInput input = 0u;
     PlayerNumber playerNumber = INVALID_PLAYER;
-    short health = PLAYER_HEALTH;
+    float health = PLAYER_HEALTH;
     float shootingTime = 0.0f;
     float invincibilityTime = 0.0f;
     bool isGrounded = false;
@@ -23,6 +23,9 @@ struct PlayerCharacter
 
     core::Vec2f lookDir = core::Vec2f::zero();
     AnimationState animationState = AnimationState::NONE;
+
+    float bulletPower = 0.0f;
+    core::Entity currentBullet = 0;
 };
 class GameManager;
 

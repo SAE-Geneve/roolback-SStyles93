@@ -35,7 +35,8 @@ namespace game
      * \brief mmaxPlayerNmb is a integer constant that defines the maximum number of player per game
      */
     constexpr std::uint32_t MAX_PLAYER_NMB = 2;
-    constexpr short PLAYER_HEALTH = 3;
+    constexpr float PLAYER_HEALTH = 100.0f;
+    constexpr core::Vec2f HEALTH_BAR_SCALE{ 4.0f, 0.5f };
     constexpr float PLAYER_SPEED = 5.0f;
     constexpr float PLAYER_JUMP_FORCE = 10.0f;
     constexpr float PLAYER_SHOOTING_PERIOD = 1.0f;
@@ -48,6 +49,8 @@ namespace game
     constexpr float BULLET_SCALE = 2.0f;
     constexpr float BULLET_PERIOD = 3.0f;
     constexpr float BULLET_ROTATION_SPEED = 500.0f;
+    constexpr float BULLET_POWER = 2.0f;
+    constexpr float BULLET_PER_LIFE_COEF = 4.0f;
 
     constexpr  float GRAVITY = -9.81f;
 
@@ -58,6 +61,7 @@ namespace game
 
     constexpr core::Color FLOOR_COLOR = core::Color(125, 180, 0, 255);
 
+    constexpr float GAME_VOLUME = 20.0f;
 
 /**
  * \brief windowBufferSize is the size of input stored by a client. 5 seconds of frame at 50 fps
@@ -101,6 +105,15 @@ constexpr std::array<core::Vec2f, std::max(4u, MAX_PLAYER_NMB)> SPAWN_DIRECTION
     core::Vec2f(1,0),
     core::Vec2f(-1,0),
 };
+
+constexpr std::array<float, std::max(4u, MAX_PLAYER_NMB)> HEALTHBAR_POSITION
+{
+    -6.0f,
+    4.0f,
+    -0.0f,
+    2.0f,
+};
+constexpr float HEALTH_BAR_HEIGHT = 8.0f;
 
 enum class ComponentType : core::EntityMask
 {

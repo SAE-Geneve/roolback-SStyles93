@@ -31,12 +31,13 @@ public:
     virtual ~GameManager() = default;
     virtual void SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction);
     virtual core::Entity SpawnBullet(PlayerNumber, core::Vec2f position, core::Vec2f velocity);
+    virtual core::Entity CreateHealthBar(PlayerNumber playerNumber);
     virtual void DestroyBullet(core::Entity entity);
     [[nodiscard]] core::Entity GetEntityFromPlayerNumber(PlayerNumber playerNumber) const;
     [[nodiscard]] Frame GetCurrentFrame() const { return currentFrame_; }
     [[nodiscard]] Frame GetLastValidateFrame() const { return rollbackManager_.GetLastValidateFrame(); }
-    [[nodiscard]] const core::TransformManager& GetTransformManager() const { return transformManager_; }
-    [[nodiscard]] const RollbackManager& GetRollbackManager() const { return rollbackManager_; }
+    [[nodiscard]] core::TransformManager& GetTransformManager() { return transformManager_; }
+    [[nodiscard]] RollbackManager& GetRollbackManager() { return rollbackManager_; }
     virtual void SetPlayerInput(PlayerNumber playerNumber, PlayerInput playerInput, std::uint32_t inputFrame);
     /**
      * \brief Validate is a method called by the server to validate a frame.
@@ -85,7 +86,8 @@ public:
      */
     void SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction) override;
     core::Entity SpawnBullet(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f velocity) override;
-    void FixedUpdate();
+    core::Entity CreateHealthBar(PlayerNumber playerNumber) override;
+	void FixedUpdate();
     void SetPlayerInput(PlayerNumber playerNumber, PlayerInput playerInput, std::uint32_t inputFrame) override;
     void DrawImGui() override;
     void ConfirmValidateFrame(Frame newValidateFrame, const std::array<PhysicsState, MAX_PLAYER_NMB>& physicsStates);
@@ -114,10 +116,13 @@ protected:
 	sf::Texture wallTexture_{};
     std::vector<sf::Texture> backgroundTextures_{};
 
+    std::vector<core::Entity> healthBars{};
+
     SoundManager soundManager_;
 
     sf::Font font_;
     sf::Text textRenderer_;
-    bool drawPhysics_ = false;
+
+	bool drawPhysics_ = false;
 };
 }

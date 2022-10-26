@@ -10,8 +10,10 @@ namespace game
  */
 struct Bullet
 {
-    float remainingTime = 0.0f;
     PlayerNumber playerNumber = INVALID_PLAYER;
+	float remainingTime = 0.0f;
+    
+    float power = 0.0f;
 };
 
 class GameManager;

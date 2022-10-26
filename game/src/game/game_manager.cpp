@@ -73,6 +73,17 @@ core::Entity GameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec2f pos
 	rollbackManager_.SpawnBullet(playerNumber, entity, position, velocity);
 	return entity;
 }
+core::Entity GameManager::CreateHealthBar(PlayerNumber playerNumber)
+{
+	const core::Entity entity = entityManager_.CreateEntity();
+
+	transformManager_.AddComponent(entity);
+	transformManager_.SetScale(entity, HEALTH_BAR_SCALE);
+	rollbackManager_.SpawnHealthBar(playerNumber, entity);
+
+	return entity;
+}
+
 void GameManager::DestroyBullet(core::Entity entity)
 {
 	rollbackManager_.DestroyEntity(entity);
@@ -143,6 +154,7 @@ void ClientGameManager::Begin()
 	//load sounds
 	soundManager_.LoadSound("cat_hiss", soundManager_.catHissSound);
 	soundManager_.LoadSound("cat_jump", soundManager_.catJumpSound);
+	soundManager_.soundToPlay.setVolume(GAME_VOLUME);
 }
 void ClientGameManager::Update(sf::Time dt)
 {
@@ -188,7 +200,7 @@ void ClientGameManager::Update(sf::Time dt)
 				}
 				//Updates the animations
 				animationManager_.UpdateEntity(entity, player.animationState, dt);
-				//Plays the correct sound on the entitiy according to its state
+				//Plays the correct sound on the entity according to its state
 				soundManager_.PlaySound(entity);
 
 				transformManager_.SetPosition(entity, rollbackManager_.GetTransformManager().GetPosition(entity));
@@ -298,7 +310,6 @@ void ClientGameManager::Draw(sf::RenderTarget& target)
 	}
 	else
 	{
-		std::string health;
 		const auto& playerManager = rollbackManager_.GetPlayerCharacterManager();
 		for (PlayerNumber playerNumber = 0; playerNumber < MAX_PLAYER_NMB; playerNumber++)
 		{
@@ -307,15 +318,11 @@ void ClientGameManager::Draw(sf::RenderTarget& target)
 			{
 				continue;
 			}
-			health += fmt::format("P{} health: {} ", playerNumber + 1, playerManager.GetComponent(playerEntity).health);
+			transformManager_.SetScale(healthBars[playerNumber], core::Vec2f{
+			HEALTH_BAR_SCALE.x * static_cast<float>(playerManager.GetComponent(playerEntity).health)/ static_cast<float>(PLAYER_HEALTH),
+				HEALTH_BAR_SCALE.y });
 		}
-		textRenderer_.setFillColor(sf::Color::White);
-		textRenderer_.setString(health);
-		textRenderer_.setPosition(10, 10);
-		textRenderer_.setCharacterSize(20);
-		target.draw(textRenderer_);
 	}
-
 }
 void ClientGameManager::SetClientPlayer(PlayerNumber clientPlayer)
 {
@@ -533,7 +540,9 @@ void ClientGameManager::CreateBackground()
 		spriteManager_.AddComponent(entity);
 		spriteManager_.SetTexture(entity, background);
 		transformManager_.AddComponent(entity);
-		transformManager_.SetScale(entity, core::Vec2f(10.0f, 10.0f));
+		transformManager_.SetScale(entity, core::Vec2f(
+			(static_cast<float>(windowSize_.x) / core::PIXEL_PER_METER ) * 1.4f,
+			(static_cast<float>(windowSize_.y)/core::PIXEL_PER_METER) * 1.4f));
 		spriteManager_.SetOrigin(entity, sf::Vector2f(background.getSize()) / 2.0f);
 	}
 
@@ -541,9 +550,43 @@ void ClientGameManager::CreateBackground()
 	spriteManager_.AddComponent(entity);
 	spriteManager_.SetTexture(entity, wallTexture_);
 	transformManager_.AddComponent(entity);
-	transformManager_.SetScale(entity, core::Vec2f(40.0f, 5.0f));
+	transformManager_.SetScale(entity, core::Vec2f(
+		(static_cast<float>(windowSize_.x)/core::PIXEL_PER_METER) * 10.0f,
+		(static_cast<float>(windowSize_.y) / core::PIXEL_PER_METER)* 0.8f));
 	transformManager_.SetPosition(entity, core::Vec2f(0.0f, -9.0f));
 	spriteManager_.SetOrigin(entity, sf::Vector2f(wallTexture_.getSize()) / 2.0f);
 	spriteManager_.SetColor(entity, FLOOR_COLOR);
+}
+
+core::Entity ClientGameManager::CreateHealthBar(PlayerNumber playerNumber)
+{
+	const core::Entity backHealthBar = GameManager::CreateHealthBar(playerNumber);
+	const core::Entity entity = GameManager::CreateHealthBar(playerNumber);
+
+	spriteManager_.AddComponent(backHealthBar);
+	spriteManager_.SetTexture(backHealthBar, wallTexture_);
+	spriteManager_.SetOrigin(backHealthBar, sf::Vector2f(0.0f, static_cast<float>(wallTexture_.getSize().y) / 2.0f));
+	core::Color backHealthColorBar = PLAYER_COLORS[playerNumber];
+	backHealthColorBar.a = 110;
+	spriteManager_.SetColor(backHealthBar, backHealthColorBar);
+
+	transformManager_.AddComponent(backHealthBar);
+	transformManager_.SetScale(backHealthBar, core::Vec2f{ HEALTH_BAR_SCALE.x, HEALTH_BAR_SCALE.y });
+	transformManager_.SetPosition(backHealthBar,
+		core::Vec2f{ HEALTHBAR_POSITION[playerNumber],HEALTH_BAR_HEIGHT });
+
+	spriteManager_.AddComponent(entity);
+	spriteManager_.SetTexture(entity, wallTexture_);
+	spriteManager_.SetOrigin(entity, sf::Vector2f(0.0f, static_cast<float>(wallTexture_.getSize().y) / 2.0f));
+	spriteManager_.SetColor(entity, PLAYER_COLORS[playerNumber]);
+
+	transformManager_.AddComponent(entity);
+	transformManager_.SetScale(entity, core::Vec2f{ HEALTH_BAR_SCALE.x, HEALTH_BAR_SCALE.y });
+	transformManager_.SetPosition(entity, 
+		core::Vec2f{ HEALTHBAR_POSITION[playerNumber],HEALTH_BAR_HEIGHT });
+
+	healthBars.push_back(entity);
+
+	return entity;
 }
 }

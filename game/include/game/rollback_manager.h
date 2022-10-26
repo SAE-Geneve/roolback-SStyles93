@@ -63,11 +63,14 @@ public:
 	[[nodiscard]] Frame GetLastValidateFrame() const { return lastValidateFrame_; }
 	[[nodiscard]] Frame GetLastReceivedFrame(PlayerNumber playerNumber) const { return lastReceivedFrame_[playerNumber]; }
 	[[nodiscard]] Frame GetCurrentFrame() const { return currentFrame_; }
-	[[nodiscard]] const core::TransformManager& GetTransformManager() const { return currentTransformManager_; }
+	[[nodiscard]] core::TransformManager& GetTransformManager() { return currentTransformManager_; }
 	[[nodiscard]] const PlayerCharacterManager& GetPlayerCharacterManager() const { return currentPlayerManager_; }
+	[[nodiscard]] PhysicsManager& GetCurrentPhysicsManager() { return currentPhysicsManager_; }
+	[[nodiscard]] BulletManager& GetCurrentBulletManager() { return currentBulletManager_; }
 	void SpawnPlayer(PlayerNumber playerNumber, core::Entity entity, core::Vec2f position, core::Vec2f lookDirection);
 	void SpawnBullet(PlayerNumber playerNumber, core::Entity entity, core::Vec2f position, core::Vec2f velocity);
-	void SpawnWall(core::Entity entity, core::Vec2f position);
+	void SpawnHealthBar(PlayerNumber playerNumber, core::Entity entity);
+
 	/**
 	 * \brief DestroyEntity is a method that does not destroy the entity definitely, but puts the DESTROY flag on.
 	 * An entity is truly destroyed when the destroy frame is validated.
@@ -82,8 +85,8 @@ public:
 	}
 
 	//void RespawnPlayer(core::Entity entity);
+	
 
-	PhysicsManager& GetCurrentPhysicsManager() { return currentPhysicsManager_; }
 private:
 
 	[[nodiscard]] PlayerInput GetInputAtFrame(PlayerNumber playerNumber, Frame frame) const;

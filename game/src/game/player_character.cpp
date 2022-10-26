@@ -77,11 +77,11 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         }
         
     	//Set player's looking direction
-        if(right)
+        if(right && !playerCharacter.isShooting)
         {
             playerCharacter.lookDir = core::Vec2f::right();
         }
-        if (left)
+        if (left && !playerCharacter.isShooting)
         {
             playerCharacter.lookDir = core::Vec2f::left();
         }
@@ -101,28 +101,74 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
             playerCharacter.shootingTime += dt.asSeconds();
             SetComponent(playerEntity, playerCharacter);
         }
+
         //Shooting mechanism
         if (playerCharacter.shootingTime >= PLAYER_SHOOTING_PERIOD)
         {
             playerCharacter.isShooting = false;
 
-            ////TO UNCOMMENT / COMMENT to use shoot in the air or not
             if (shoot)
-            //if (shoot && playerCharacter.isGrounded)
+                //if (shoot && playerCharacter.isGrounded)
             {
-                const auto bulletVelocity = playerCharacter.lookDir * BULLET_SPEED;
-                const auto bulletPosition = playerBody.position + playerCharacter.lookDir * 0.5f + playerBody.velocity * dt.asSeconds();
-                gameManager_.SpawnBullet(playerCharacter.playerNumber,
-                    bulletPosition,
-                    bulletVelocity);
 
                 playerCharacter.isShooting = true;
-                playerCharacter.shootingTime = 0.0f;
+
+                if (playerCharacter.currentBullet == NULL)
+                {
+                    const auto bulletPosition = playerBody.position + playerCharacter.lookDir * 0.5f;
+
+                    playerCharacter.currentBullet = gameManager_.SpawnBullet(playerCharacter.playerNumber,
+                        bulletPosition,
+                        core::Vec2f::zero());
+
+                }
+                else if (playerCharacter.bulletPower < BULLET_SCALE && playerCharacter.currentBullet != NULL)
+                {
+                    if (entityManager_.EntityExists(playerCharacter.currentBullet)) 
+                    {
+                        playerCharacter.bulletPower += dt.asSeconds() / 2; //Charging power
+
+                    	//Increasing Collider radius
+                        CircleCollider bulletCircle{};
+                        bulletCircle.radius = playerCharacter.bulletPower / (BULLET_SCALE * 1.5f);
+                        gameManager_.GetRollbackManager().GetCurrentPhysicsManager().SetCircle(playerCharacter.currentBullet, bulletCircle);
+
+                        //Increasing Scale
+                        const core::Vec2f bulletScale{ playerCharacter.bulletPower + BULLET_SCALE/2,playerCharacter.bulletPower + BULLET_SCALE/2};
+                        gameManager_.GetRollbackManager().GetTransformManager().SetScale(playerCharacter.currentBullet, bulletScale);
+
+                        //Increasing Bullet power
+                        Bullet bullet = gameManager_.GetRollbackManager().GetCurrentBulletManager().GetComponent(playerCharacter.currentBullet);
+                        bullet.power = playerCharacter.bulletPower * (BULLET_MAX_POWER/2);
+                        gameManager_.GetRollbackManager().GetCurrentBulletManager().SetComponent(playerCharacter.currentBullet, bullet);
+
+                    	//Setting position of bullet to player's pos
+                        Rigidbody bulletRb = physicsManager_.GetRigidbody(playerCharacter.currentBullet);
+                        const core::Vec2f bulletPosition{ playerBody.position + playerCharacter.lookDir * 0.5f };
+                        bulletRb.position = bulletPosition;
+                        physicsManager_.SetRigidbody(playerCharacter.currentBullet, bulletRb);
+                    }
+
+                }
             }
+            else if (!shoot && playerCharacter.currentBullet != NULL)
+            {
+                if(entityManager_.EntityExists(playerCharacter.currentBullet))
+                {
+                    //Setting Bullet velocity on shoot release
+                    Rigidbody bulletRb = physicsManager_.GetRigidbody(playerCharacter.currentBullet);
+                    bulletRb.velocity = playerCharacter.lookDir * BULLET_SPEED / (playerCharacter.bulletPower + 0.5f); //Bigger bullet goes slower
+                    physicsManager_.SetRigidbody(playerCharacter.currentBullet, bulletRb);
 
-        	SetComponent(playerEntity, playerCharacter);
-
+                }
+                //Resetting shooting vars
+            	playerCharacter.isShooting = false;
+                playerCharacter.currentBullet = NULL;
+                playerCharacter.shootingTime = 0.0f;
+                playerCharacter.bulletPower = 0.0f;
+            }
         }
+            SetComponent(playerEntity, playerCharacter);
     }
 }
 }

@@ -39,8 +39,8 @@ void BulletManager::FixedUpdate(sf::Time dt)
             physicsManager_.SetRigidbody(entity, bulletBody);
 
             auto& bullet = components_[entity];
-            bullet.remainingTime -= dt.asSeconds();
-            if (bullet.remainingTime < 0.0f || 
+            /*bullet.remainingTime -= dt.asSeconds();*/
+            if (/*bullet.remainingTime < 0.0f ||*/ 
                 bulletBody.position.x <= LEFT_LIMIT * 0.95f || 
                 bulletBody.position.x >= RIGHT_LIMIT * 0.95f)
             {

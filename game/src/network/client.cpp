@@ -35,6 +35,7 @@ void Client::ReceivePacket(const Packet* packet)
         const auto dir = core::ConvertFromBinary<core::Vec2f>(spawnPlayerPacket->dir);
 
         gameManager_.SpawnPlayer(playerNumber, pos, dir);
+        gameManager_.CreateHealthBar(playerNumber);
         break;
     }
     case PacketType::START_GAME:
