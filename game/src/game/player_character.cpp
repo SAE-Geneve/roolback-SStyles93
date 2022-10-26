@@ -122,24 +122,15 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
                         core::Vec2f::zero());
 
                 }
-                else if (playerCharacter.bulletPower < BULLET_SCALE && playerCharacter.currentBullet != NULL)
+                else if (playerCharacter.bulletPower < BULLET_POWER && playerCharacter.currentBullet != NULL)
                 {
                     if (entityManager_.EntityExists(playerCharacter.currentBullet)) 
                     {
                         playerCharacter.bulletPower += dt.asSeconds() / 2; //Charging power
 
-                    	//Increasing Collider radius
-                        CircleCollider bulletCircle{};
-                        bulletCircle.radius = playerCharacter.bulletPower / (BULLET_SCALE * 1.5f);
-                        gameManager_.GetRollbackManager().GetCurrentPhysicsManager().SetCircle(playerCharacter.currentBullet, bulletCircle);
-
-                        //Increasing Scale
-                        const core::Vec2f bulletScale{ playerCharacter.bulletPower + BULLET_SCALE/2,playerCharacter.bulletPower + BULLET_SCALE/2};
-                        gameManager_.GetRollbackManager().GetTransformManager().SetScale(playerCharacter.currentBullet, bulletScale);
-
                         //Increasing Bullet power
                         Bullet bullet = gameManager_.GetRollbackManager().GetCurrentBulletManager().GetComponent(playerCharacter.currentBullet);
-                        bullet.power = playerCharacter.bulletPower * (BULLET_MAX_POWER/2);
+                        bullet.power = playerCharacter.bulletPower;
                         gameManager_.GetRollbackManager().GetCurrentBulletManager().SetComponent(playerCharacter.currentBullet, bullet);
 
                     	//Setting position of bullet to player's pos

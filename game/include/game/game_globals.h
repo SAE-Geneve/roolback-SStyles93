@@ -51,6 +51,7 @@ namespace game
     constexpr float BULLET_ROTATION_SPEED = 500.0f;
     constexpr float BULLET_POWER = 2.0f;
     constexpr float BULLET_PER_LIFE_COEF = 4.0f;
+    constexpr float BULLET_PUSH_POWER = 40.0f;
 
     constexpr  float GRAVITY = -9.81f;
 

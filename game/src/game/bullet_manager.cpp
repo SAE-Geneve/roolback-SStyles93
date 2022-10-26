@@ -24,10 +24,21 @@ void BulletManager::FixedUpdate(sf::Time dt)
         {
             continue;
         }
-        if (entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::BULLET)))
+        if (entityManager_.HasComponent(entity, 
+            static_cast<core::EntityMask>(ComponentType::BULLET)))
         {
+            const auto& bullet = components_[entity];
             auto bulletBody = physicsManager_.GetRigidbody(entity);
 
+            //Increasing Collider radius
+            CircleCollider bulletCircle{};
+            bulletCircle.radius = bullet.power / (BULLET_SCALE * 1.5f);
+            physicsManager_.SetCircle(entity, bulletCircle);
+
+            //Increasing Scale
+            const core::Vec2f bulletScale{ bullet.power + BULLET_SCALE / 2,bullet.power + BULLET_SCALE / 2 };
+            gameManager_.GetRollbackManager().GetTransformManager().SetScale(entity, bulletScale);
+            
             if(bulletBody.velocity.x > 0.0f)
             {
                 bulletBody.rotation += dt.asSeconds() * BULLET_ROTATION_SPEED;
@@ -37,8 +48,8 @@ void BulletManager::FixedUpdate(sf::Time dt)
                 bulletBody.rotation -= dt.asSeconds() * BULLET_ROTATION_SPEED;
             }
             physicsManager_.SetRigidbody(entity, bulletBody);
-
-            auto& bullet = components_[entity];
+            
+            
             /*bullet.remainingTime -= dt.asSeconds();*/
             if (/*bullet.remainingTime < 0.0f ||*/ 
                 bulletBody.position.x <= LEFT_LIMIT * 0.95f || 
