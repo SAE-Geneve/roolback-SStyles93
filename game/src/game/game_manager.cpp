@@ -73,16 +73,6 @@ core::Entity GameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec2f pos
 	rollbackManager_.SpawnBullet(playerNumber, entity, position, velocity);
 	return entity;
 }
-core::Entity GameManager::CreateHealthBar(PlayerNumber playerNumber)
-{
-	const core::Entity entity = entityManager_.CreateEntity();
-
-	transformManager_.AddComponent(entity);
-	transformManager_.SetScale(entity, HEALTH_BAR_SCALE);
-	rollbackManager_.SpawnHealthBar(playerNumber, entity);
-
-	return entity;
-}
 
 void GameManager::DestroyBullet(core::Entity entity)
 {
@@ -119,7 +109,9 @@ ClientGameManager::ClientGameManager(PacketSenderInterface& packetSenderInterfac
 	animationManager_(entityManager_, spriteManager_, *this),
 	soundManager_(entityManager_, *this)
 {
+	healthBarMap.fill(core::INVALID_ENTITY);
 }
+
 void ClientGameManager::Begin()
 {
 #ifdef TRACY_ENABLE
@@ -318,7 +310,7 @@ void ClientGameManager::Draw(sf::RenderTarget& target)
 			{
 				continue;
 			}
-			transformManager_.SetScale(healthBars[playerNumber], core::Vec2f{
+			transformManager_.SetScale(healthBarMap[playerNumber], core::Vec2f{
 			HEALTH_BAR_SCALE.x * static_cast<float>(playerManager.GetComponent(playerEntity).health)/ static_cast<float>(PLAYER_HEALTH),
 				HEALTH_BAR_SCALE.y });
 		}
@@ -541,8 +533,8 @@ void ClientGameManager::CreateBackground()
 		spriteManager_.SetTexture(entity, background);
 		transformManager_.AddComponent(entity);
 		transformManager_.SetScale(entity, core::Vec2f(
-			(static_cast<float>(windowSize_.x) / core::PIXEL_PER_METER ) * 1.4f,
-			(static_cast<float>(windowSize_.y)/core::PIXEL_PER_METER) * 1.4f));
+			(static_cast<float>(windowSize_.x) / core::PIXEL_PER_METER ) * 1.5f,
+			(static_cast<float>(windowSize_.y)/core::PIXEL_PER_METER) * 1.5f));
 		spriteManager_.SetOrigin(entity, sf::Vector2f(background.getSize()) / 2.0f);
 	}
 
@@ -560,14 +552,17 @@ void ClientGameManager::CreateBackground()
 
 core::Entity ClientGameManager::CreateHealthBar(PlayerNumber playerNumber)
 {
-	const core::Entity backHealthBar = GameManager::CreateHealthBar(playerNumber);
-	const core::Entity entity = GameManager::CreateHealthBar(playerNumber);
+	if (healthBarMap[playerNumber] != core::INVALID_ENTITY)
+		return core::INVALID_ENTITY;
+	const core::Entity backHealthBar = entityManager_.CreateEntity();
+	const core::Entity entity = entityManager_.CreateEntity();
+	healthBarMap[playerNumber] = entity;
 
 	spriteManager_.AddComponent(backHealthBar);
 	spriteManager_.SetTexture(backHealthBar, wallTexture_);
 	spriteManager_.SetOrigin(backHealthBar, sf::Vector2f(0.0f, static_cast<float>(wallTexture_.getSize().y) / 2.0f));
 	core::Color backHealthColorBar = PLAYER_COLORS[playerNumber];
-	backHealthColorBar.a = 110;
+	backHealthColorBar.a = 110u;
 	spriteManager_.SetColor(backHealthBar, backHealthColorBar);
 
 	transformManager_.AddComponent(backHealthBar);
@@ -584,8 +579,6 @@ core::Entity ClientGameManager::CreateHealthBar(PlayerNumber playerNumber)
 	transformManager_.SetScale(entity, core::Vec2f{ HEALTH_BAR_SCALE.x, HEALTH_BAR_SCALE.y });
 	transformManager_.SetPosition(entity, 
 		core::Vec2f{ HEALTHBAR_POSITION[playerNumber],HEALTH_BAR_HEIGHT });
-
-	healthBars.push_back(entity);
 
 	return entity;
 }

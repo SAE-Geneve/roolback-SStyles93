@@ -216,13 +216,13 @@ void RollbackManager::ValidateFrame(Frame newValidateFrame)
     createdEntities_.clear();
 }
 
-void RollbackManager::ConfirmFrame(Frame newValidateFrame, const std::array<PhysicsState, MAX_PLAYER_NMB>& serverPhysicsState)
+void RollbackManager::ConfirmFrame(Frame newValidatedFrame, const std::array<PhysicsState, MAX_PLAYER_NMB>& serverPhysicsState)
 {
 
 #ifdef TRACY_ENABLE
     ZoneScoped;
 #endif
-    ValidateFrame(newValidateFrame);
+    ValidateFrame(newValidatedFrame);
     for (PlayerNumber playerNumber = 0; playerNumber < MAX_PLAYER_NMB; playerNumber++)
     {
         const PhysicsState lastPhysicsState = GetValidatePhysicsState(playerNumber);
@@ -230,7 +230,7 @@ void RollbackManager::ConfirmFrame(Frame newValidateFrame, const std::array<Phys
         {
             gpr_assert(false, fmt::format("Physics State are not equal for player {} (server frame: {}, client frame: {}, server: {}, client: {})", 
                 playerNumber+1, 
-                newValidateFrame, 
+                newValidatedFrame, 
                 lastValidateFrame_, 
                 serverPhysicsState[playerNumber], 
                 lastPhysicsState));
@@ -448,7 +448,7 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
     bulletBody.velocity = velocity;
     bulletBody.gravityScale = 0.0f;
     CircleCollider bulletSphere;
-    bulletSphere.radius = 0.25f/* * BULLET_SCALE*/;
+    bulletSphere.radius = 0.25f;
 
     currentBulletManager_.AddComponent(entity);
     currentBulletManager_.SetComponent(entity, {  playerNumber, BULLET_PERIOD, 0.0f });
@@ -460,7 +460,7 @@ void RollbackManager::SpawnBullet(PlayerNumber playerNumber, core::Entity entity
 
     currentTransformManager_.AddComponent(entity);
     currentTransformManager_.SetPosition(entity, position);
-    currentTransformManager_.SetScale(entity, core::Vec2f::one()/* * BULLET_SCALE*/);
+    currentTransformManager_.SetScale(entity, core::Vec2f::one());
     currentTransformManager_.SetRotation(entity, core::Degree(0.0f));
 }
 
@@ -479,12 +479,6 @@ void RollbackManager::DestroyEntity(core::Entity entity)
         return;
     }
         entityManager_.AddComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED));
-}
-
-void RollbackManager::SpawnHealthBar(PlayerNumber playerNumber, core::Entity entity)
-{
-    currentTransformManager_.AddComponent(entity);
-    currentTransformManager_.SetScale(entity, HEALTH_BAR_SCALE);
 }
 
 //	void RollbackManager::RespawnPlayer(core::Entity entity)

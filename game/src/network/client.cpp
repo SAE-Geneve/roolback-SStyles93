@@ -70,7 +70,8 @@ void Client::ReceivePacket(const Packet* packet)
                 }
                 if (inputs[index] != playerInputPacket->inputs[i])
                 {
-                    gpr_assert(false, "Inputs coming back from server are not coherent!!!");
+                    //gpr_assert(false, "Inputs coming back from server are not coherent!!!");
+                    core::LogWarning("Inputs coming back from server are not coherent!!!");
                 }
                 if (inputFrame - i == 0)
                 {

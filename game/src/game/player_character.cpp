@@ -162,7 +162,8 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
                 playerCharacter.bulletPower = 0.0f;
             }
         }
-            SetComponent(playerEntity, playerCharacter);
+
+    	SetComponent(playerEntity, playerCharacter);
     }
 }
 }

@@ -31,7 +31,6 @@ public:
     virtual ~GameManager() = default;
     virtual void SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction);
     virtual core::Entity SpawnBullet(PlayerNumber, core::Vec2f position, core::Vec2f velocity);
-    virtual core::Entity CreateHealthBar(PlayerNumber playerNumber);
     virtual void DestroyBullet(core::Entity entity);
     [[nodiscard]] core::Entity GetEntityFromPlayerNumber(PlayerNumber playerNumber) const;
     [[nodiscard]] Frame GetCurrentFrame() const { return currentFrame_; }
@@ -86,7 +85,7 @@ public:
      */
     void SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction) override;
     core::Entity SpawnBullet(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f velocity) override;
-    core::Entity CreateHealthBar(PlayerNumber playerNumber) override;
+    core::Entity CreateHealthBar(PlayerNumber playerNumber);
 	void FixedUpdate();
     void SetPlayerInput(PlayerNumber playerNumber, PlayerInput playerInput, std::uint32_t inputFrame) override;
     void DrawImGui() override;
@@ -116,7 +115,7 @@ protected:
 	sf::Texture wallTexture_{};
     std::vector<sf::Texture> backgroundTextures_{};
 
-    std::vector<core::Entity> healthBars{};
+    std::array<core::Entity, MAX_PLAYER_NMB>  healthBarMap{};
 
     SoundManager soundManager_;
 

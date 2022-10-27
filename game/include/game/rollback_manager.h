@@ -69,8 +69,6 @@ public:
 	[[nodiscard]] BulletManager& GetCurrentBulletManager() { return currentBulletManager_; }
 	void SpawnPlayer(PlayerNumber playerNumber, core::Entity entity, core::Vec2f position, core::Vec2f lookDirection);
 	void SpawnBullet(PlayerNumber playerNumber, core::Entity entity, core::Vec2f position, core::Vec2f velocity);
-	void SpawnHealthBar(PlayerNumber playerNumber, core::Entity entity);
-
 	/**
 	 * \brief DestroyEntity is a method that does not destroy the entity definitely, but puts the DESTROY flag on.
 	 * An entity is truly destroyed when the destroy frame is validated.
