@@ -148,7 +148,10 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
                 {
                     //Setting Bullet velocity on shoot release
                     Rigidbody bulletRb = physicsManager_.GetRigidbody(playerCharacter.currentBullet);
-                    bulletRb.velocity = playerCharacter.lookDir * BULLET_SPEED / (playerCharacter.bulletPower + 0.5f); //Bigger bullet goes slower
+                    bulletRb.velocity = 
+                        playerCharacter.lookDir * BULLET_SPEED / 
+                        (gameManager_.GetRollbackManager().GetCurrentBulletManager().
+                            GetComponent(playerCharacter.currentBullet).power + 0.5f); //Bigger bullet goes slower
                     physicsManager_.SetRigidbody(playerCharacter.currentBullet, bulletRb);
 
                 }

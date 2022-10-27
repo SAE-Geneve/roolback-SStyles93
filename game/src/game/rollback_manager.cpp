@@ -367,15 +367,37 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         auto bullet1Rigidbody = currentPhysicsManager_.GetRigidbody(entity1);
         auto bullet2Rigidbody = currentPhysicsManager_.GetRigidbody(entity2);
         auto mtv = currentPhysicsManager_.GetMTV();
+        if (bullet1.playerNumber == bullet2.playerNumber)
+        {
+            return;
+        }
+        if(bullet1.power > bullet2.power)
+        {
+            bullet1.power -= bullet2.power;
+            bullet2Rigidbody.velocity.x *= -1.0f;
+            currentBulletManager_.SetComponent(entity1, bullet1);
+            gameManager_.DestroyBullet((entity2));
+        }
+        else if(bullet2.power > bullet1.power)
+        {
+            bullet2.power -= bullet1.power;
+            bullet2Rigidbody.velocity.x *= -1.0f;
+            currentBulletManager_.SetComponent(entity2, bullet2);
+            gameManager_.DestroyBullet(entity1);
+        }
+        else
+        {
+            PhysicsManager::SolveCollision(bullet1Rigidbody, bullet2Rigidbody);
+            PhysicsManager::SolveMTV(bullet1Rigidbody, bullet2Rigidbody, mtv);
 
-        PhysicsManager::SolveCollision(bullet1Rigidbody, bullet2Rigidbody);
-        PhysicsManager::SolveMTV(bullet1Rigidbody, bullet2Rigidbody, mtv);
+        	gameManager_.DestroyBullet(entity1);
+            gameManager_.DestroyBullet((entity2));
+        }
 
+		if(entityManager_.HasComponent(entity1, static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY)))
         currentPhysicsManager_.SetRigidbody(entity1, bullet1Rigidbody);
+        if (entityManager_.HasComponent(entity2, static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY)))
         currentPhysicsManager_.SetRigidbody(entity2, bullet2Rigidbody);
-
-        gameManager_.DestroyBullet(entity1);
-        gameManager_.DestroyBullet((entity2));
     };
 
     //Collision between players
