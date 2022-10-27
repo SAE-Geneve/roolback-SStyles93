@@ -52,8 +52,8 @@ void BulletManager::FixedUpdate(sf::Time dt)
             
             /*bullet.remainingTime -= dt.asSeconds();*/
             if (/*bullet.remainingTime < 0.0f ||*/ 
-                bulletBody.position.x <= LEFT_LIMIT * 0.95f || 
-                bulletBody.position.x >= RIGHT_LIMIT * 0.95f)
+                bulletBody.position.x <= LEFT_LIMIT || 
+                bulletBody.position.x >= RIGHT_LIMIT)
             {
                 gameManager_.DestroyBullet(entity);
             }

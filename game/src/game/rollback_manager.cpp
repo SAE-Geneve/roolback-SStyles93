@@ -354,7 +354,15 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
                 core::LogDebug(fmt::format("Player {} is hit by bullet", playerCharacter.playerNumber));
                 playerCharacter.health -= bullet.power * (PLAYER_HEALTH/BULLET_PER_LIFE_COEF);
                 playerCharacter.invincibilityTime = PLAYER_INVINCIBILITY_PERIOD;
-                playerRigidbody.velocity.x = (1/bulletRigidbody.velocity.x) * BULLET_PUSH_POWER;
+                if(bulletRigidbody.velocity.x > 0)
+                {
+                    playerRigidbody.velocity.x = (1 / bulletRigidbody.velocity.x) * BULLET_PUSH_POWER;
+                }
+            	else
+                {
+                    playerRigidbody.velocity.x = (playerRigidbody.position - bulletRigidbody.position).GetNormalized().x * bullet.power * 10.0f;
+                }
+                
             }
             currentPlayerManager_.SetComponent(playerEntity, playerCharacter);
             currentPhysicsManager_.SetRigidbody(playerEntity, playerRigidbody);
@@ -381,7 +389,7 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         else if(bullet2.power > bullet1.power)
         {
             bullet2.power -= bullet1.power;
-            bullet2Rigidbody.velocity.x *= -1.0f;
+            bullet1Rigidbody.velocity.x *= -1.0f;
             currentBulletManager_.SetComponent(entity2, bullet2);
             gameManager_.DestroyBullet(entity1);
         }
