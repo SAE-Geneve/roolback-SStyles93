@@ -53,7 +53,7 @@ bool Box2Circle(BoxCollider myBox, Rigidbody myBody,
 	{
 		return false;
 	}
-	/*const core::Vec2f direction = otherBody.position - myBody.position;
+	const core::Vec2f direction = otherBody.position - myBody.position;
 
 	const float distanceMagnitude = direction.GetMagnitude();
 	const float radiusSum = myBox.extends.x /2.0f + otherCircle.radius;
@@ -61,7 +61,7 @@ bool Box2Circle(BoxCollider myBox, Rigidbody myBody,
 	const float mtvDifference = radiusSum - distanceMagnitude;
 	mtv = direction.GetNormalized() * mtvDifference;
 
-	return (distanceMagnitude <= radiusSum);*/
+	return (distanceMagnitude <= radiusSum);
 	return true;
 }
 //bool Box2Box(BoxCollider myBox, Rigidbody myBody,
@@ -293,16 +293,16 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 				static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) | static_cast<core::EntityMask>(ComponentType::BOX_COLLIDER)) ||
 				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 				continue;
-			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(entity);
+			Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(entity);
 			const CircleCollider& circle = circleColliderManager_.GetComponent(entity);
 
-			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(otherEntity);
+			Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(otherEntity);
 			const BoxCollider& box = boxColliderManager_.GetComponent(otherEntity);
 
 			if (Box2Circle(box, rigidbody2, circle, rigidbody1, mtv_))
 			{
-				onTriggerAction_.Execute(entity, otherEntity);
-				//core::LogDebug("Collision");
+				SolveCollision(rigidbody1, rigidbody2);
+				SolveMTV(rigidbody1, rigidbody2, mtv_);
 			}
 		}
 	}
@@ -321,16 +321,16 @@ void PhysicsManager::FixedUpdate(sf::Time dt)
 				static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) | static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)) ||
 				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 				continue;
-			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(otherEntity);
+			Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(otherEntity);
 			const CircleCollider& circle = circleColliderManager_.GetComponent(otherEntity);
 
-			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(entity);
+			Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(entity);
 			const BoxCollider& box = boxColliderManager_.GetComponent(entity);
 
 			if (Box2Circle(box, rigidbody2, circle, rigidbody1, mtv_))
 			{
-				onTriggerAction_.Execute(entity, otherEntity);
-				//core::LogDebug("Collision");
+				SolveCollision(rigidbody1, rigidbody2);
+				SolveMTV(rigidbody1, rigidbody2, mtv_);
 			}
 		}
 	}

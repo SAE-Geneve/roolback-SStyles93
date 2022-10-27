@@ -392,10 +392,10 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
     {
         auto playerRigidbody = currentPhysicsManager_.GetRigidbody(entity1);
         auto wallRigidbody = currentPhysicsManager_.GetRigidbody(entity2);
-        auto mtv = currentPhysicsManager_.GetMTV();
+        //auto mtv = currentPhysicsManager_.GetMTV();
 
         PhysicsManager::SolveCollision(playerRigidbody, wallRigidbody);
-        PhysicsManager::SolveMTV(playerRigidbody, wallRigidbody, mtv);
+        //PhysicsManager::SolveMTV(playerRigidbody, wallRigidbody, mtv);
 
         currentPhysicsManager_.SetRigidbody(entity1, playerRigidbody);
         currentPhysicsManager_.SetRigidbody(entity2, wallRigidbody);
