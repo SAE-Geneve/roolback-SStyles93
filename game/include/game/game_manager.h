@@ -85,7 +85,7 @@ public:
      */
     void SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction) override;
     core::Entity SpawnBullet(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f velocity) override;
-    core::Entity CreateHealthBar(PlayerNumber playerNumber);
+    void CreateHealthBar(PlayerNumber playerNumber);
 	void FixedUpdate();
     void SetPlayerInput(PlayerNumber playerNumber, PlayerInput playerInput, std::uint32_t inputFrame) override;
     void DrawImGui() override;

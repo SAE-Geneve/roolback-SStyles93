@@ -23,15 +23,20 @@ enum class AnimationState
     SHOOT,
     NONE
 };
+struct AnimationData
+{
+    float time = 0;
+    int textureIdx = 0;
+    AnimationState animationState = AnimationState::NONE;
+};
 struct Animation
 {
-    int textureIdx = 0;
     std::vector<sf::Texture> textures{};
 };
 /**
  * \brief AnimationManager is a ComponentManager that holds all the animations in one place.
  */
-class AnimationManager : public core::ComponentManager<Animation, static_cast<core::EntityMask>(ComponentType::ANIMATION)>
+class AnimationManager : public core::ComponentManager<AnimationData, static_cast<core::EntityMask>(ComponentType::ANIMATION_DATA)>
 {
 
 public:
@@ -41,11 +46,10 @@ public:
    
     void LoadTexture(std::string_view path, Animation& animation) const;
     
-    void PlayAnimation(const core::Entity& entity, Animation& animation, float speed);
+    void PlayAnimation(const core::Entity& entity, const Animation& animation, AnimationData& animationData, float speed) const;
+    void LoopAnimation(const core::Entity& entity, const Animation& animation, AnimationData& animationData, float speed) const;
 
     void UpdateEntity(core::Entity entity, AnimationState animationState, sf::Time dt);
-
-    float animationTime_ = 0;
 
     Animation catIdle;
     Animation catWalk;

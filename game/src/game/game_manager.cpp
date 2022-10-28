@@ -330,6 +330,7 @@ void ClientGameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f posit
 	spriteManager_.SetTexture(entity, animationManager_.catIdle.textures[0]);
 	spriteManager_.SetOrigin(entity, sf::Vector2f(animationManager_.catIdle.textures[0].getSize()) / 2.0f);
 	spriteManager_.SetColor(entity, PLAYER_COLORS[playerNumber]);
+	animationManager_.AddComponent(entity);
 
 }
 core::Entity ClientGameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f velocity)
@@ -550,10 +551,10 @@ void ClientGameManager::CreateBackground()
 	spriteManager_.SetColor(entity, FLOOR_COLOR);
 }
 
-core::Entity ClientGameManager::CreateHealthBar(PlayerNumber playerNumber)
+void ClientGameManager::CreateHealthBar(PlayerNumber playerNumber)
 {
 	if (healthBarMap[playerNumber] != core::INVALID_ENTITY)
-		return core::INVALID_ENTITY;
+		return;
 	const core::Entity backHealthBar = entityManager_.CreateEntity();
 	const core::Entity entity = entityManager_.CreateEntity();
 	healthBarMap[playerNumber] = entity;
@@ -580,6 +581,6 @@ core::Entity ClientGameManager::CreateHealthBar(PlayerNumber playerNumber)
 	transformManager_.SetPosition(entity, 
 		core::Vec2f{ HEALTHBAR_POSITION[playerNumber],HEALTH_BAR_HEIGHT });
 
-	return entity;
+	return;
 }
 }

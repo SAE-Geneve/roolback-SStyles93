@@ -20,7 +20,7 @@ void AnimationManager::LoadTexture(const std::string_view path, Animation& anima
 	//LOAD SPRITES
 	for (size_t i = 0; i < textureCount; i++)
 	{
-		sf::Texture newTexture;
+		sf::Texture newTexture{};
 		const auto fullPath = fmt::format("data/sprites/{}/{}{}.png",path, path, i);
 		if (!newTexture.loadFromFile(fullPath))
 		{
@@ -30,107 +30,81 @@ void AnimationManager::LoadTexture(const std::string_view path, Animation& anima
 	}
 }
 
-void AnimationManager::PlayAnimation(const core::Entity& entity,Animation& animation, float speed)
+void AnimationManager::LoopAnimation(const core::Entity& entity, const Animation& animation, AnimationData& animationData, const float speed) const
 {
-	auto& playerCharacter = gameManager_.GetRollbackManager().GetPlayerCharacterManager().GetComponent(entity);
 	auto& playerSprite = spriteManager_.GetComponent(entity);
-	
-	
-	switch (playerCharacter.animationState)
+
+	if (animationData.time >= ANIMATION_PERIOD / speed)
 	{
-	case AnimationState::IDLE:
-	case AnimationState::WALK:
-		//Ignores animations if the "cat_shoot" animation is playing
-		if(playerCharacter.isShooting) 
-			break;
-		//Plays animation
-		if (animationTime_ >= ANIMATION_PERIOD / speed)
+		animationData.textureIdx++;
+		if (animationData.textureIdx >= animation.textures.size())
 		{
-			animation.textureIdx++;
-			if (animation.textureIdx >= animation.textures.size())
-			{
-				//resets the animation (it loops)
-				animation.textureIdx = 0;
-			}
-			animationTime_ = 0;
+			//resets the animation (it loops)
+			animationData.textureIdx = 0;
 		}
-		//Prevents texture index from being out of range of the textures vector
-		if (animation.textureIdx >= animation.textures.size())
-		{
-			animation.textureIdx = animation.textures.size() - 1;
-		}
-		playerSprite.setTexture(animation.textures[animation.textureIdx]);
-		break;
-
-	case AnimationState::JUMP:
-		if (playerCharacter.isShooting)
-			break;
-
-		if (playerCharacter.isGrounded)
-		{
-			animation.textureIdx = 0;
-		}
-		if (animationTime_ >= ANIMATION_PERIOD / speed)
-		{
-			animation.textureIdx++;
-			if (animation.textureIdx >= animation.textures.size())
-			{
-				//blocks the animation on last texture
-				animation.textureIdx = animation.textures.size() - 1;
-			}
-			animationTime_ = 0;
-		}
-		if (animation.textureIdx >= animation.textures.size())
-		{
-			animation.textureIdx = animation.textures.size() - 1;
-		}
-		playerSprite.setTexture(animation.textures[animation.textureIdx]);
-		break;
-
-	case AnimationState::SHOOT:
-		if (animationTime_ >= ANIMATION_PERIOD / speed)
-		{
-			animation.textureIdx++;
-			if (animation.textureIdx >= animation.textures.size())
-			{
-					animation.textureIdx = 0;
-			}
-			animationTime_ = 0;
-		}
-		if (animation.textureIdx >= animation.textures.size())
-		{
-			animation.textureIdx = animation.textures.size() - 1;
-		}
-		playerSprite.setTexture(animation.textures[animation.textureIdx]);
-		break;
-
-	case AnimationState::NONE:
-		break;
-
-	default:
-		core::LogError("PlayAnimation not working as expected");
-		break;
+		animationData.time = 0;
 	}
+	//Prevents texture index from being out of range of the textures vector
+	if (animationData.textureIdx >= animation.textures.size())
+	{
+		animationData.textureIdx = animation.textures.size() - 1;
+	}
+	playerSprite.setTexture(animation.textures[animationData.textureIdx]);
+}
+
+void AnimationManager::PlayAnimation(const core::Entity& entity, const Animation& animation, AnimationData& animationData, const float speed) const
+{
+	auto& playerSprite = spriteManager_.GetComponent(entity);
+
+	if (animationData.time >= ANIMATION_PERIOD / speed)
+	{
+		animationData.textureIdx++;
+		if (animationData.textureIdx >= animation.textures.size())
+		{
+			//blocks the animation on last texture
+			animationData.textureIdx = animation.textures.size() - 1;
+		}
+		animationData.time = 0;
+	}
+	if (animationData.textureIdx >= animation.textures.size())
+	{
+		animationData.textureIdx = animation.textures.size() - 1;
+	}
+	playerSprite.setTexture(animation.textures[animationData.textureIdx]);
 }
 
 void AnimationManager::UpdateEntity(core::Entity entity, AnimationState animationState, sf::Time dt)
 {
-	animationTime_ += dt.asSeconds();
+	AnimationData& data = GetComponent(entity);
+	data.time += dt.asSeconds();
+
+	const auto playerCharacter = gameManager_.GetRollbackManager().GetPlayerCharacterManager().GetComponent(entity);
+
+	if(data.animationState != playerCharacter.animationState)
+	{
+		data.textureIdx = 0;
+	}
+
 	switch (animationState)
 	{
 	case AnimationState::IDLE:
-		PlayAnimation(entity, catIdle, 1.0f);
+		data.animationState = AnimationState::IDLE;
+		LoopAnimation(entity, catIdle, data, 1.0f);
 		break;
 
 	case AnimationState::WALK:
-		PlayAnimation(entity, catWalk, 1.0f);
+		data.animationState = AnimationState::WALK;
+		LoopAnimation(entity, catWalk, data, 1.0f);
 		break;
 
 	case AnimationState::JUMP:
-		PlayAnimation(entity, catJump, 2.0f);
+		data.animationState = AnimationState::JUMP;
+		PlayAnimation(entity, catJump, data, 2.0f);
 		break;
+
 	case AnimationState::SHOOT:
-		PlayAnimation(entity, catShoot, 1.0f);
+		data.animationState = AnimationState::SHOOT;
+		LoopAnimation(entity, catShoot, data, 1.0f);
 		break;
 
 	case AnimationState::NONE:

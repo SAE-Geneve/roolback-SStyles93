@@ -122,7 +122,7 @@ enum class ComponentType : core::EntityMask
     DIRECTION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 1u,
     PLAYER_CHARACTER = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE)<< 2u,
     BULLET = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 3u,
-    ANIMATION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 4u,
+    ANIMATION_DATA = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 4u,
     SOUND = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 5u,
     DESTROYED = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 6u
 };

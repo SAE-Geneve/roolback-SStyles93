@@ -63,7 +63,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
             playerCharacter.animationState = (right || left) && !up && !shoot && playerCharacter.isGrounded ?
                 AnimationState::WALK : playerCharacter.animationState;
 
-            playerCharacter.animationState = up && !shoot ?
+            playerCharacter.animationState = up && !shoot && !playerCharacter.isGrounded ?
                 AnimationState::JUMP : playerCharacter.animationState;
 
             ////UNCOMMENT / COMMENT to use shoot in the air or not
