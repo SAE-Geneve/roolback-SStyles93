@@ -7,11 +7,11 @@ namespace game
 	SoundManager::SoundManager(core::EntityManager& entityManager, GameManager& gameManager) :
 		ComponentManager(entityManager), gameManager_(gameManager) {}
 
-	void SoundManager::LoadSound(const std::string_view path, Sound& sound) const
+	void SoundManager::LoadSound(const std::string_view path, SoundBuffer& soundBuffer) const
 	{
 		//LOAD SOUNDS
 		const auto fullPath = fmt::format("data/sounds/{}.wav", path);
-		if (!sound.soundBuffer.loadFromFile(fullPath))
+		if (!soundBuffer.soundBuffer.loadFromFile(fullPath))
 		{
 			core::LogError(fmt::format("Could not load data/sounds/{}.wav sound", path));
 		}
@@ -21,26 +21,34 @@ namespace game
 	{
 		auto& playerCharacter = gameManager_.GetRollbackManager().GetPlayerCharacterManager().GetComponent(entity);
 
-		if (playerCharacter.animationState == AnimationState::JUMP && playerCharacter.isGrounded)
+
+		AudioSource& source = GetComponent(entity);
+		source.sound.setVolume(GAME_VOLUME);
+
+		if (source.sound.getStatus() == sf::Sound::Playing ||
+			source.animationState == playerCharacter.animationState)
+			return;
+		
+		if (playerCharacter.animationState == AnimationState::JUMP)
 		{
-			soundToPlay.setBuffer(catJumpSound.soundBuffer);
-			if (soundToPlay.getStatus() == sf::Sound::Playing)
-				return;
-			soundToPlay.play();
+			source.sound.setBuffer(catJumpSound.soundBuffer);
+			source.sound.play();
+			source.animationState = AnimationState::JUMP;
 		}
-		if (playerCharacter.animationState == AnimationState::SHOOT && playerCharacter.isShooting)
+		if (playerCharacter.animationState == AnimationState::SHOOT)
 		{
-			soundToPlay.setBuffer(catShootSound.soundBuffer);
-			if (soundToPlay.getStatus() == sf::Sound::Playing)
-				return;
-			soundToPlay.play();
+			source.sound.setBuffer(catShootSound.soundBuffer);
+			source.sound.play();
+			source.animationState = AnimationState::SHOOT;
 		}
-		if (playerCharacter.invincibilityTime == PLAYER_INVINCIBILITY_PERIOD)
+		if (playerCharacter.invincibilityTime >= PLAYER_INVINCIBILITY_PERIOD)
 		{
-			soundToPlay.setBuffer(catHissSound.soundBuffer);
-			if (soundToPlay.getStatus() == sf::Sound::Playing)
-				return;
-			soundToPlay.play();
+			source.sound.setBuffer(catHissSound.soundBuffer);
+			source.sound.play();
+		}
+		if(playerCharacter.isGrounded)
+		{
+			source.animationState = AnimationState::NONE;
 		}
 	}
 }

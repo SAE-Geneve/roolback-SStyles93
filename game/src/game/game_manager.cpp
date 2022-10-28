@@ -146,7 +146,6 @@ void ClientGameManager::Begin()
 	//load sounds
 	soundManager_.LoadSound("cat_hiss", soundManager_.catHissSound);
 	soundManager_.LoadSound("cat_jump", soundManager_.catJumpSound);
-	soundManager_.soundToPlay.setVolume(GAME_VOLUME);
 }
 void ClientGameManager::Update(sf::Time dt)
 {
@@ -331,7 +330,7 @@ void ClientGameManager::SpawnPlayer(PlayerNumber playerNumber, core::Vec2f posit
 	spriteManager_.SetOrigin(entity, sf::Vector2f(animationManager_.catIdle.textures[0].getSize()) / 2.0f);
 	spriteManager_.SetColor(entity, PLAYER_COLORS[playerNumber]);
 	animationManager_.AddComponent(entity);
-
+	soundManager_.AddComponent(entity);
 }
 core::Entity ClientGameManager::SpawnBullet(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f velocity)
 {

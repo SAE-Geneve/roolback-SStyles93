@@ -42,7 +42,6 @@ class AnimationManager : public core::ComponentManager<AnimationData, static_cas
 public:
 
     AnimationManager(core::EntityManager& entityManager, core::SpriteManager& spriteManager, GameManager& gameManager);
-
    
     void LoadTexture(std::string_view path, Animation& animation) const;
     
