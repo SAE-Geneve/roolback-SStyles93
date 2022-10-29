@@ -32,7 +32,7 @@ void BulletManager::FixedUpdate(sf::Time dt) const
 
             //Increasing Collider radius
             CircleCollider bulletCircle{};
-            bulletCircle.radius = bullet.power / (BULLET_SCALE * 1.5f);
+            bulletCircle.radius = bullet.power / (BULLET_SCALE * 1.5f) + 0.1f;
             physicsManager_.SetCircle(entity, bulletCircle);
 
             //Increasing Scale

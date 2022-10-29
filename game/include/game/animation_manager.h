@@ -36,7 +36,7 @@ struct Animation
 /**
  * \brief AnimationManager is a ComponentManager that holds all the animations in one place.
  */
-class AnimationManager : public core::ComponentManager<AnimationData, static_cast<core::EntityMask>(ComponentType::ANIMATION_DATA)>
+class AnimationManager : public core::ComponentManager<AnimationData, static_cast<core::EntityMask>(ComponentType::ANIMATION)>
 {
 
 public:

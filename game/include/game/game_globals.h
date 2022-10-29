@@ -35,32 +35,32 @@ namespace game
      * \brief mmaxPlayerNmb is a integer constant that defines the maximum number of player per game
      */
     constexpr std::uint32_t MAX_PLAYER_NMB = 2;
+
     constexpr float PLAYER_HEALTH = 100.0f;
-    constexpr core::Vec2f HEALTH_BAR_SCALE{ 4.0f, 0.5f };
     constexpr float PLAYER_SPEED = 5.0f;
     constexpr float PLAYER_JUMP_FORCE = 10.0f;
-    constexpr float PLAYER_SHOOTING_PERIOD = 1.0f;
-    constexpr float PLAYER_CHARGE_SPEED = 3.0f;
+    constexpr float PLAYER_SHOOTING_PERIOD = 0.5f;
+    constexpr float PLAYER_CHARGE_SPEED = 0.8f;
     constexpr float PLAYER_INVINCIBILITY_PERIOD = 1.5f;
     constexpr float INVINCIBILITY_FLASH_PERIOD = 0.5f;
-    constexpr core::Vec2f PLAYER_SCALE{ 5.0f,5.0f };
-    constexpr float ANIMATION_PERIOD = 0.25f;
-
+	constexpr float ANIMATION_PERIOD = 0.25f;
+    
     constexpr float BULLET_SPEED = 5.0f;
     constexpr float BULLET_SCALE = 2.0f;
     constexpr float BULLET_PERIOD = 3.0f;
     constexpr float BULLET_ROTATION_SPEED = 500.0f;
-    constexpr float BULLET_POWER = 2.0f;
+    constexpr float BULLET_MAX_POWER = 2.0f;
     constexpr float BULLET_PER_LIFE_COEF = 4.0f;
     constexpr float BULLET_PUSH_POWER = 40.0f;
 
     constexpr  float GRAVITY = -9.81f;
-
     constexpr float UPPER_LIMIT = 8.0f;
     constexpr float RIGHT_LIMIT = 10.0f;
     constexpr float LOWER_LIMIT = -7.0f;
     constexpr float LEFT_LIMIT = -10.0f;
 
+	constexpr core::Vec2f HEALTH_BAR_SCALE{ 4.0f, 0.5f };
+    constexpr core::Vec2f PLAYER_SCALE{ 5.0f,5.0f };
     constexpr core::Color FLOOR_COLOR = core::Color(125, 180, 0, 255);
 
     constexpr float GAME_VOLUME = 20.0f;
@@ -123,7 +123,7 @@ enum class ComponentType : core::EntityMask
     DIRECTION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 1u,
     PLAYER_CHARACTER = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE)<< 2u,
     BULLET = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 3u,
-    ANIMATION_DATA = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 4u,
+    ANIMATION = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 4u,
     SOUND = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 5u,
     DESTROYED = static_cast<core::EntityMask>(core::ComponentType::OTHER_TYPE) << 6u
 };

@@ -67,7 +67,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
                 AnimationState::JUMP : playerCharacter.animationState;
 
             ////UNCOMMENT / COMMENT to use shoot in the air or not
-            playerCharacter.animationState = shoot ?
+            playerCharacter.animationState = shoot && playerCharacter.shootingTime >= PLAYER_SHOOTING_PERIOD ?
             //playerCharacter.animationState = shoot && playerCharacter.isGrounded ?
                 AnimationState::SHOOT : playerCharacter.animationState;
         }
@@ -122,11 +122,11 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
                         core::Vec2f::zero());
 
                 }
-                else if (playerCharacter.bulletPower < BULLET_POWER && playerCharacter.currentBullet != NULL)
+                else if (playerCharacter.bulletPower < BULLET_MAX_POWER && playerCharacter.currentBullet != NULL)
                 {
                     if (entityManager_.EntityExists(playerCharacter.currentBullet)) 
                     {
-                        playerCharacter.bulletPower += dt.asSeconds() / PLAYER_CHARGE_SPEED;
+                        playerCharacter.bulletPower += dt.asSeconds() * PLAYER_CHARGE_SPEED;
 
                         //Increasing Bullet power
                         Bullet bullet = gameManager_.GetRollbackManager().GetCurrentBulletManager().GetComponent(playerCharacter.currentBullet);
@@ -151,7 +151,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
                     Rigidbody bulletRb = physicsManager_.GetRigidbody(playerCharacter.currentBullet);
 
                 	bulletRb.velocity = 
-                        playerCharacter.lookDir * BULLET_SPEED / (bullet.power/BULLET_POWER + 0.5f) ; //Bigger bullet goes slower
+                        playerCharacter.lookDir * BULLET_SPEED / (bullet.power/BULLET_MAX_POWER + 0.5f) ; //Bigger bullet goes slower
 
                     physicsManager_.SetRigidbody(playerCharacter.currentBullet, bulletRb);
 
