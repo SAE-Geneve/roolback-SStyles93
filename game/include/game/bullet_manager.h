@@ -30,7 +30,7 @@ public:
     explicit BulletManager(
         core::EntityManager& entityManager, GameManager& gameManager, PhysicsManager& physicsManager);
 
-    void FixedUpdate(sf::Time dt);
+    void FixedUpdate(sf::Time dt) const;
 
 private:
     GameManager& gameManager_;

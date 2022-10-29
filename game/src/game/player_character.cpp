@@ -126,7 +126,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
                 {
                     if (entityManager_.EntityExists(playerCharacter.currentBullet)) 
                     {
-                        playerCharacter.bulletPower += dt.asSeconds() / 2; //Charging power
+                        playerCharacter.bulletPower += dt.asSeconds() / PLAYER_CHARGE_SPEED;
 
                         //Increasing Bullet power
                         Bullet bullet = gameManager_.GetRollbackManager().GetCurrentBulletManager().GetComponent(playerCharacter.currentBullet);
@@ -135,7 +135,7 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
 
                     	//Setting position of bullet to player's pos
                         Rigidbody bulletRb = physicsManager_.GetRigidbody(playerCharacter.currentBullet);
-                        const core::Vec2f bulletPosition{ playerBody.position + playerCharacter.lookDir * 0.5f };
+                        const core::Vec2f bulletPosition{ playerBody.position + playerCharacter.lookDir * 0.5f};
                         bulletRb.position = bulletPosition;
                         physicsManager_.SetRigidbody(playerCharacter.currentBullet, bulletRb);
                     }
@@ -147,11 +147,12 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
                 if(entityManager_.EntityExists(playerCharacter.currentBullet))
                 {
                     //Setting Bullet velocity on shoot release
+                    const auto bullet = gameManager_.GetRollbackManager().GetCurrentBulletManager().GetComponent(playerCharacter.currentBullet);
                     Rigidbody bulletRb = physicsManager_.GetRigidbody(playerCharacter.currentBullet);
-                    bulletRb.velocity = 
-                        playerCharacter.lookDir * BULLET_SPEED / 
-                        (gameManager_.GetRollbackManager().GetCurrentBulletManager().
-                            GetComponent(playerCharacter.currentBullet).power + 0.5f); //Bigger bullet goes slower
+
+                	bulletRb.velocity = 
+                        playerCharacter.lookDir * BULLET_SPEED / (bullet.power/BULLET_POWER + 0.5f) ; //Bigger bullet goes slower
+
                     physicsManager_.SetRigidbody(playerCharacter.currentBullet, bulletRb);
 
                 }

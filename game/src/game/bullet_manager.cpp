@@ -12,7 +12,7 @@ BulletManager::BulletManager(
 {
 }
 
-void BulletManager::FixedUpdate(sf::Time dt)
+void BulletManager::FixedUpdate(sf::Time dt) const
 {
 
 #ifdef TRACY_ENABLE
@@ -48,12 +48,9 @@ void BulletManager::FixedUpdate(sf::Time dt)
                 bulletBody.rotation -= dt.asSeconds() * BULLET_ROTATION_SPEED;
             }
             physicsManager_.SetRigidbody(entity, bulletBody);
-            
-            
-            /*bullet.remainingTime -= dt.asSeconds();*/
-            if (/*bullet.remainingTime < 0.0f ||*/ 
-                bulletBody.position.x <= LEFT_LIMIT * 1.25 || 
-                bulletBody.position.x >= RIGHT_LIMIT * 1.25)
+           
+            if (bulletBody.position.x <= LEFT_LIMIT * 1.25f || 
+                bulletBody.position.x >= RIGHT_LIMIT * 1.25f)
             {
                 gameManager_.DestroyBullet(entity);
             }

@@ -40,6 +40,7 @@ namespace game
     constexpr float PLAYER_SPEED = 5.0f;
     constexpr float PLAYER_JUMP_FORCE = 10.0f;
     constexpr float PLAYER_SHOOTING_PERIOD = 1.0f;
+    constexpr float PLAYER_CHARGE_SPEED = 3.0f;
     constexpr float PLAYER_INVINCIBILITY_PERIOD = 1.5f;
     constexpr float INVINCIBILITY_FLASH_PERIOD = 0.5f;
     constexpr core::Vec2f PLAYER_SCALE{ 5.0f,5.0f };

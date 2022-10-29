@@ -374,6 +374,10 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
     {
         auto bullet1Rigidbody = currentPhysicsManager_.GetRigidbody(entity1);
         auto bullet2Rigidbody = currentPhysicsManager_.GetRigidbody(entity2);
+
+        auto bullet1Transform = currentTransformManager_.GetScale(entity1);
+        auto bullet2Transform = currentTransformManager_.GetScale(entity2);
+
         auto mtv = currentPhysicsManager_.GetMTV();
         if (bullet1.playerNumber == bullet2.playerNumber)
         {
@@ -382,15 +386,17 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         if(bullet1.power > bullet2.power)
         {
             bullet1.power -= bullet2.power;
-            bullet2Rigidbody.velocity.x *= -1.0f;
             currentBulletManager_.SetComponent(entity1, bullet1);
-            gameManager_.DestroyBullet((entity2));
+            bullet2Transform = core::Vec2f::zero();
+            currentTransformManager_.SetScale(entity2, bullet2Transform);
+            gameManager_.DestroyBullet(entity2);
         }
         else if(bullet2.power > bullet1.power)
         {
             bullet2.power -= bullet1.power;
-            bullet1Rigidbody.velocity.x *= -1.0f;
             currentBulletManager_.SetComponent(entity2, bullet2);
+            bullet1Transform = core::Vec2f::zero();
+            currentTransformManager_.SetScale(entity1, bullet1Transform);
             gameManager_.DestroyBullet(entity1);
         }
         else
