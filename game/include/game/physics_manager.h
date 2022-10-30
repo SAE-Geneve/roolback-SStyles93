@@ -23,14 +23,8 @@ enum class BodyType
     STATIC
 };
 
-struct BoxCollider
-{
-    core::Vec2f extends = core::Vec2f::one();
-    bool isTrigger = false;
-};
-
 /**
- * \brief SphereCollider is a spherical shape collider used in the physics engine
+ * \brief CircleCollider is a circle shape collider used in the physics engine
  */
 struct CircleCollider
 {
@@ -50,10 +44,11 @@ struct Rigidbody
 
 	core::Vec2f acceleration = core::Vec2f::zero();
 
+    BodyType bodyType = BodyType::DYNAMIC;
+
     float bounciness = 1.0f;
     float gravityScale = 1.0f;
-
-    BodyType bodyType = BodyType::DYNAMIC;
+    bool hasCollided = false;
 };
 
 /**
@@ -75,17 +70,6 @@ class RigidbodyManager : public core::ComponentManager<Rigidbody, static_cast<co
 public:
     using ComponentManager::ComponentManager;
 };
-
-
-/**
- * \brief BoxManager is a ComponentManager that holds all the Box in the world.
- */
-class BoxColliderManager : public core::ComponentManager<BoxCollider, static_cast<core::EntityMask>(ComponentType::BOX_COLLIDER)>
-{
-public:
-    using ComponentManager::ComponentManager;
-};
-
 /**
  * \brief BoxManager is a ComponentManager that holds all the Box in the world.
  */

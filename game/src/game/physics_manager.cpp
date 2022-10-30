@@ -62,15 +62,28 @@ void PhysicsManager::SolveCollision(Rigidbody& myBody, Rigidbody& otherBody)
 	const core::Vec2f v1AfterImpact = core::Vec2f(n.x * v2n + g.x * v1g, n.y * v2n + g.y * v1g);
 	const core::Vec2f v2AfterImpact = core::Vec2f(n.x * v1n + g.x * v2g, n.y * v1n + g.y * v2g);
 
-	if (myBody.bodyType == BodyType::DYNAMIC)
-		myBody.velocity = v1AfterImpact * myBody.bounciness;
-	else
-		otherBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * otherBody.bounciness;
-
-	if (otherBody.bodyType == BodyType::DYNAMIC)
-		otherBody.velocity = v2AfterImpact * otherBody.bounciness;
-	else
-		myBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * myBody.bounciness;
+	if (!myBody.hasCollided || !otherBody.hasCollided) 
+	{
+		if (myBody.bodyType == BodyType::DYNAMIC)
+		{
+			myBody.velocity = v1AfterImpact * myBody.bounciness;
+		}
+		else
+		{
+			otherBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * otherBody.bounciness;
+		}
+		myBody.hasCollided = true;
+	
+		if (otherBody.bodyType == BodyType::DYNAMIC)
+		{
+			otherBody.velocity = v2AfterImpact * otherBody.bounciness;
+		}
+		else
+		{
+			myBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * myBody.bounciness;
+		}
+		otherBody.hasCollided = true;
+	}
 }
 /**
  * \brief Solves the new positions of given rigidbodies
@@ -163,6 +176,7 @@ void PhysicsManager::CheckForCircleCollisions()
 			static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)) ||
 			entityManager_.HasComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 			continue;
+		
 
 		for (core::Entity otherEntity = entity + 1; otherEntity < entityManager_.GetEntitiesSize(); otherEntity++)
 		{
@@ -170,13 +184,17 @@ void PhysicsManager::CheckForCircleCollisions()
 				static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY) | static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)) ||
 				entityManager_.HasComponent(otherEntity, static_cast<core::EntityMask>(ComponentType::DESTROYED)))
 				continue;
+
+			if (!entityManager_.EntityExists(entity) || !entityManager_.EntityExists(otherEntity))
+				continue;
+
 			const Rigidbody& rigidbody1 = rigidbodyManager_.GetComponent(entity);
-			const CircleCollider& sphere1 = circleColliderManager_.GetComponent(entity);
+			const CircleCollider& circle1 = circleColliderManager_.GetComponent(entity);
 
 			const Rigidbody& rigidbody2 = rigidbodyManager_.GetComponent(otherEntity);
-			const CircleCollider& sphere2 = circleColliderManager_.GetComponent(otherEntity);
+			const CircleCollider& circle2 = circleColliderManager_.GetComponent(otherEntity);
 
-			if (IsOverlappingCircle(sphere1, rigidbody1, sphere2, rigidbody2, mtv_))
+			if (IsOverlappingCircle(circle1, rigidbody1, circle2, rigidbody2, mtv_))
 			{
 				onTriggerAction_.Execute(entity, otherEntity);
 			}
