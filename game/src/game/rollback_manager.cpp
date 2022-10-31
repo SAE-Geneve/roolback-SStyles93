@@ -284,7 +284,6 @@ void RollbackManager::SpawnPlayer(PlayerNumber playerNumber, core::Entity entity
 #endif
     Rigidbody playerBody;
     playerBody.position = position;
-    //playerBody.bounciness = 0.0f;
 
     CircleCollider playerCircle;
     playerCircle.radius = 0.5f;
@@ -483,14 +482,4 @@ void RollbackManager::DestroyEntity(core::Entity entity)
     }
         entityManager_.AddComponent(entity, static_cast<core::EntityMask>(ComponentType::DESTROYED));
 }
-
-//	void RollbackManager::RespawnPlayer(core::Entity entity)
-//{
-//    /*auto playerCharacter = currentPlayerManager_.GetComponent(entity);
-//
-//    core::LogDebug(fmt::format("Player {} fell of platform", playerCharacter.playerNumber));
-//    --playerCharacter.health;
-//
-//    currentPlayerManager_.SetComponent(entity, playerCharacter);*/
-//}
 }

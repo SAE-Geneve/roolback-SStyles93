@@ -35,7 +35,6 @@ namespace game
         
         SoundBuffer catJumpSound;
         SoundBuffer catHissSound;
-        SoundBuffer catShootSound;
 
     private:
         GameManager& gameManager_;

@@ -1,6 +1,8 @@
+#include <fmt/format.h>
+#include <filesystem>
+
 #include "game/animation_manager.h"
 #include "game/game_manager.h"
-#include <fmt/format.h>
 
 namespace game
 {

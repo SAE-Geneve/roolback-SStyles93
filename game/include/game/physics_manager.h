@@ -32,7 +32,7 @@ struct CircleCollider
     bool isTrigger = false;
 };
 /**
- * \brief Rigidbody is a class that represents a rigid body.
+ * \brief Rigidbody is a class that represents a physical body.
  */
 struct Rigidbody
 {
@@ -71,7 +71,7 @@ public:
     using ComponentManager::ComponentManager;
 };
 /**
- * \brief BoxManager is a ComponentManager that holds all the Box in the world.
+ * \brief CircleColliderManager is a ComponentManager that holds all the CircleColliders in the world.
  */
 class CircleColliderManager : public core::ComponentManager<CircleCollider, static_cast<core::EntityMask>(core::ComponentType::CIRCLE_COLLIDER)>
 {
@@ -80,7 +80,7 @@ public:
 };
 
 /**
- * \brief PhysicsManager is a class that holds both BodyManager and BoxManager and manages the physics fixed update.
+ * \brief PhysicsManager is a class that holds both RigidbodyManager and CircleManager and manages the physics fixed update.
  * It allows to register OnTriggerInterface to be called when a trigger occcurs.
  */
 class PhysicsManager : public core::DrawInterface

@@ -82,9 +82,6 @@ public:
 		return inputs_[playerNumber];
 	}
 
-	//void RespawnPlayer(core::Entity entity);
-	
-
 private:
 
 	[[nodiscard]] PlayerInput GetInputAtFrame(PlayerNumber playerNumber, Frame frame) const;
