@@ -20,7 +20,7 @@ void AnimationManager::LoadTexture(const std::string_view path, Animation& anima
 		[](auto& entry) { return entry.is_regular_file() && entry.path().extension() == ".png"; });
 
 	//LOAD SPRITES
-	for (size_t i = 0; i < textureCount; i++)
+	for (int i = 0; i < textureCount; i++)
 	{
 		sf::Texture newTexture{};
 		const auto fullPath = fmt::format("data/sprites/{}/{}{}.png",path, path, i);
@@ -39,7 +39,7 @@ void AnimationManager::LoopAnimation(const core::Entity& entity, const Animation
 	if (animationData.time >= ANIMATION_PERIOD / speed)
 	{
 		animationData.textureIdx++;
-		if (animationData.textureIdx >= animation.textures.size())
+		if (animationData.textureIdx >= static_cast<int>(animation.textures.size()))
 		{
 			//resets the animation (it loops)
 			animationData.textureIdx = 0;
@@ -47,9 +47,9 @@ void AnimationManager::LoopAnimation(const core::Entity& entity, const Animation
 		animationData.time = 0;
 	}
 	//Prevents texture index from being out of range of the textures vector
-	if (animationData.textureIdx >= animation.textures.size())
+	if (animationData.textureIdx >= static_cast<int>(animation.textures.size()))
 	{
-		animationData.textureIdx = animation.textures.size() - 1;
+		animationData.textureIdx = static_cast<int>(animation.textures.size()) - 1;
 	}
 	playerSprite.setTexture(animation.textures[animationData.textureIdx]);
 }
@@ -61,16 +61,16 @@ void AnimationManager::PlayAnimation(const core::Entity& entity, const Animation
 	if (animationData.time >= ANIMATION_PERIOD / speed)
 	{
 		animationData.textureIdx++;
-		if (animationData.textureIdx >= animation.textures.size())
+		if (animationData.textureIdx >= static_cast<int>(animation.textures.size()))
 		{
 			//blocks the animation on last texture
-			animationData.textureIdx = animation.textures.size() - 1;
+			animationData.textureIdx = static_cast<int>(animation.textures.size()) - 1;
 		}
 		animationData.time = 0;
 	}
-	if (animationData.textureIdx >= animation.textures.size())
+	if (animationData.textureIdx >= static_cast<int>(animation.textures.size()))
 	{
-		animationData.textureIdx = animation.textures.size() - 1;
+		animationData.textureIdx = static_cast<int>(animation.textures.size()) - 1;
 	}
 	playerSprite.setTexture(animation.textures[animationData.textureIdx]);
 }
