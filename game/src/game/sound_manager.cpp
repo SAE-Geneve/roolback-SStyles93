@@ -28,27 +28,22 @@ namespace game
 		if (source.sound.getStatus() == sf::Sound::Playing ||
 			source.animationState == playerCharacter.animationState)
 			return;
-		
+
 		if (playerCharacter.animationState == AnimationState::JUMP)
 		{
 			source.sound.setBuffer(catJumpSound.soundBuffer);
 			source.sound.play();
 			source.animationState = AnimationState::JUMP;
 		}
-		if (playerCharacter.animationState == AnimationState::SHOOT)
-		{
-			source.sound.setBuffer(catShootSound.soundBuffer);
-			source.sound.play();
-			source.animationState = AnimationState::SHOOT;
-		}
 		if (playerCharacter.invincibilityTime >= PLAYER_INVINCIBILITY_PERIOD)
 		{
 			source.sound.setBuffer(catHissSound.soundBuffer);
 			source.sound.play();
 		}
-		if(playerCharacter.isGrounded)
+		if (playerCharacter.isGrounded)
 		{
 			source.animationState = AnimationState::NONE;
 		}
+		
 	}
 }

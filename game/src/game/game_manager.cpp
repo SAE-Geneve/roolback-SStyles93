@@ -146,6 +146,7 @@ void ClientGameManager::Begin()
 	//load sounds
 	soundManager_.LoadSound("cat_hiss", soundManager_.catHissSound);
 	soundManager_.LoadSound("cat_jump", soundManager_.catJumpSound);
+
 }
 void ClientGameManager::Update(sf::Time dt)
 {

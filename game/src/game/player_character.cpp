@@ -66,9 +66,9 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
             playerCharacter.animationState = up && !shoot && !playerCharacter.isGrounded ?
                 AnimationState::JUMP : playerCharacter.animationState;
 
-            ////UNCOMMENT / COMMENT to use shoot in the air or not
-            playerCharacter.animationState = shoot && playerCharacter.shootingTime >= PLAYER_SHOOTING_PERIOD ?
-            //playerCharacter.animationState = shoot && playerCharacter.isGrounded ?
+            //UNCOMMENT / COMMENT the desired line to use shoot in the air or not
+            playerCharacter.animationState = shoot && playerCharacter.shootingTime >= PLAYER_SHOOTING_PERIOD ? //IN AIR SHOOTING
+            //playerCharacter.animationState = shoot  && playerCharacter.shootingTime >= PLAYER_SHOOTING_PERIOD && playerCharacter.isGrounded ? //NO IN AIR SHOOTING
                 AnimationState::SHOOT : playerCharacter.animationState;
         }
     	else
@@ -107,8 +107,9 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
         {
             playerCharacter.isShooting = false;
 
-            if (shoot)
-                //if (shoot && playerCharacter.isGrounded)
+            //UNCOMMENT / COMMENT the desired line to use shoot in the air or not
+            if (shoot) //IN AIR SHOOTING
+                //if (shoot && playerCharacter.isGrounded) //NO IN AIR SHOOTING
             {
 
                 playerCharacter.isShooting = true;
@@ -149,12 +150,11 @@ void PlayerCharacterManager::FixedUpdate(sf::Time dt)
                     //Setting Bullet velocity on shoot release
                     const auto bullet = gameManager_.GetRollbackManager().GetCurrentBulletManager().GetComponent(playerCharacter.currentBullet);
                     Rigidbody bulletRb = physicsManager_.GetRigidbody(playerCharacter.currentBullet);
-
-                	bulletRb.velocity = 
+                	
+                    bulletRb.velocity = 
                         playerCharacter.lookDir * BULLET_SPEED / (bullet.power/BULLET_MAX_POWER + 0.5f) ; //Bigger bullet goes slower
 
                     physicsManager_.SetRigidbody(playerCharacter.currentBullet, bulletRb);
-
                 }
                 //Resetting shooting vars
             	playerCharacter.isShooting = false;

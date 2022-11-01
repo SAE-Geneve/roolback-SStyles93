@@ -2,8 +2,7 @@
 #include "SFML/Window/Keyboard.hpp"
 
 namespace game
-{
-    
+{  
 PlayerInput GetPlayerInput(int index)
 {
     switch(index)
@@ -45,4 +44,4 @@ PlayerInput GetPlayerInput(int index)
     return 0;
    
 }
-} // namespace game
+}

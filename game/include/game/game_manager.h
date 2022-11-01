@@ -109,12 +109,6 @@ public:
      * @param clientPlayer The PlayerNumber to assign
     */
     void SetClientPlayer(PlayerNumber clientPlayer);
-    /**
-     * \brief SpawnPlayer is method that is called when receiving a SpawnPlayerPacket from the server.
-     * \param playerNumber is the player number to be spawned
-     * \param position is where the player character will be spawned
-     * \param direction is the spawning direction in witch the player character looks 
-     */
     void SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction) override;
     /**
      * @brief Spawns a bullet

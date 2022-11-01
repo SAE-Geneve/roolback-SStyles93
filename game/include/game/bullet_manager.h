@@ -22,7 +22,6 @@ class PlayerCharacterManager;
 
 /**
  * \brief BulletManager is a ComponentManager that holds all the Bullet in one place.
- * It will automatically destroy the Bullet when remainingTime is over.
  */
 class BulletManager : public core::ComponentManager<Bullet, static_cast<core::EntityMask>(ComponentType::BULLET)>
 {
