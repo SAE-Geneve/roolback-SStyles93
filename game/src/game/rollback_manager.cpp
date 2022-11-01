@@ -403,6 +403,8 @@ void RollbackManager::OnTrigger(core::Entity entity1, core::Entity entity2)
         {
             PhysicsManager::SolveCollision(bullet1Rigidbody, bullet2Rigidbody);
             PhysicsManager::SolveMTV(bullet1Rigidbody, bullet2Rigidbody, mtv);
+            gameManager_.DestroyBullet(entity1);
+            gameManager_.DestroyBullet(entity2);
         }
 
 		if(entityManager_.HasComponent(entity1, static_cast<core::EntityMask>(core::ComponentType::RIGIDBODY)))

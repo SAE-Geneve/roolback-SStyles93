@@ -29,7 +29,11 @@ class BulletManager : public core::ComponentManager<Bullet, static_cast<core::En
 public:
     explicit BulletManager(
         core::EntityManager& entityManager, GameManager& gameManager, PhysicsManager& physicsManager);
-
+    
+    /**
+     * @brief Updates the bullet manager
+     * @param dt The delta time used for updating the manager
+    */
     void FixedUpdate(sf::Time dt) const;
 
 private:

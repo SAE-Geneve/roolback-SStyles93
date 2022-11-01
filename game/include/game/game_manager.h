@@ -29,6 +29,12 @@ class GameManager
 public:
     GameManager();
     virtual ~GameManager() = default;
+    /**
+     * @brief Spawns the player on the Game Manger
+     * @param playerNumber The ID of the player to spawn
+     * @param position the position at which we want to spawn him
+     * @param direction The direction the player will be looking at when spawning
+    */
     virtual void SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction);
     virtual core::Entity SpawnBullet(PlayerNumber, core::Vec2f position, core::Vec2f velocity);
     virtual void DestroyBullet(core::Entity entity);
@@ -69,13 +75,39 @@ public:
         FINISHED = 1u << 1u,
     };
     explicit ClientGameManager(PacketSenderInterface& packetSenderInterface);
+    /**
+     * @brief Launches the begining of the game
+     * @param startingTime The given time of launch
+    */
     void StartGame(unsigned long long int startingTime);
+    /**
+     * @brief Instantiates all the elements for the game (sprites, sounds...)
+    */
     void Begin() override;
+    /**
+     * @brief The graphical update of the game
+     * @param dt The given delta time
+    */
     void Update(sf::Time dt) override;
+    /**
+     * @brief Ends the game once conditions are met
+    */
     void End() override;
+    /**
+     * @brief Sets the windowSize to the given size
+     * @param windowsSize The desired window size
+    */
     void SetWindowSize(sf::Vector2u windowsSize);
     [[nodiscard]] sf::Vector2u GetWindowSize() const { return windowSize_; }
+    /**
+     * @brief renders all the elements (sprites/texts)
+     * @param target The target to render
+    */
     void Draw(sf::RenderTarget& target) override;
+    /**
+     * @brief Sets the ClientID to the given playerNumber
+     * @param clientPlayer The PlayerNumber to assign
+    */
     void SetClientPlayer(PlayerNumber clientPlayer);
     /**
      * \brief SpawnPlayer is method that is called when receiving a SpawnPlayerPacket from the server.
@@ -84,20 +116,59 @@ public:
      * \param direction is the spawning direction in witch the player character looks 
      */
     void SpawnPlayer(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f direction) override;
+    /**
+     * @brief Spawns a bullet
+     * @param playerNumber The player's ID to give to the bullet
+     * @param position The position at which we want to spawn a bullet
+     * @param velocity The velocity to give to a bullet
+     * @return Entity (bullet)
+    */
     core::Entity SpawnBullet(PlayerNumber playerNumber, core::Vec2f position, core::Vec2f velocity) override;
+    /**
+     * @brief Creates a Healthbar for a player
+     * @param playerNumber The player number for which we want to create a Healthbar
+    */
     void CreateHealthBar(PlayerNumber playerNumber);
-	void FixedUpdate();
+    /**
+     * @brief The Physical update 
+    */
+    void FixedUpdate();
+    /**
+     * @brief Sets the players Input to the given input at a given frame
+     * @param playerNumber The ID of the player to set
+     * @param playerInput The input to give
+     * @param inputFrame The frame at which we want to set the input
+    */
     void SetPlayerInput(PlayerNumber playerNumber, PlayerInput playerInput, std::uint32_t inputFrame) override;
+    /**
+     * @brief The rendering of all Guis (ImGui)
+    */
     void DrawImGui() override;
+    /**
+     * @brief Confirmation of a fram
+     * @param newValidateFrame The new frame to validate
+     * @param physicsStates the physics state given for check and validation
+    */
     void ConfirmValidateFrame(Frame newValidateFrame, const std::array<PhysicsState, MAX_PLAYER_NMB>& physicsStates);
     [[nodiscard]] PlayerNumber GetPlayerNumber() const { return clientPlayer_; }
+    /**
+     * @brief Method used to declare when the game has been won
+     * @param winner The player ID of the winner
+    */
     void WinGame(PlayerNumber winner) override;
     [[nodiscard]] std::uint32_t GetState() const { return state_; }
 
 protected:
 
     void UpdateCameraView();
+    /**
+     * @brief Loads the background sprites in the background texture vector
+     * @param path The path that contains the sprites
+    */
     void LoadBackground(std::string_view path);
+    /**
+     * @brief Instantiates the background elements
+    */
     void CreateBackground();
 
     PacketSenderInterface& packetSenderInterface_;

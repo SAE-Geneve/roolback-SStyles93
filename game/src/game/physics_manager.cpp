@@ -62,28 +62,23 @@ void PhysicsManager::SolveCollision(Rigidbody& myBody, Rigidbody& otherBody)
 	const core::Vec2f v1AfterImpact = core::Vec2f(n.x * v2n + g.x * v1g, n.y * v2n + g.y * v1g);
 	const core::Vec2f v2AfterImpact = core::Vec2f(n.x * v1n + g.x * v2g, n.y * v1n + g.y * v2g);
 
-	if (!myBody.hasCollided || !otherBody.hasCollided) 
+	if (myBody.bodyType == BodyType::DYNAMIC)
 	{
-		if (myBody.bodyType == BodyType::DYNAMIC)
-		{
-			myBody.velocity = v1AfterImpact * myBody.bounciness;
-		}
-		else
-		{
-			otherBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * otherBody.bounciness;
-		}
-		myBody.hasCollided = true;
-	
-		if (otherBody.bodyType == BodyType::DYNAMIC)
-		{
-			otherBody.velocity = v2AfterImpact * otherBody.bounciness;
-		}
-		else
-		{
-			myBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * myBody.bounciness;
-		}
-		otherBody.hasCollided = true;
+		myBody.velocity = v1AfterImpact * myBody.bounciness;
 	}
+	else
+	{
+		otherBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * otherBody.bounciness;
+	}
+	if (otherBody.bodyType == BodyType::DYNAMIC)
+	{
+		otherBody.velocity = v2AfterImpact * otherBody.bounciness;
+	}
+	else
+	{
+		myBody.velocity = v1AfterImpact + (v2AfterImpact * -1.0f) * myBody.bounciness;
+	}
+	
 }
 /**
  * \brief Solves the new positions of given rigidbodies

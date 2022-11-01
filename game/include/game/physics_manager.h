@@ -48,7 +48,6 @@ struct Rigidbody
 
     float bounciness = 1.0f;
     float gravityScale = 1.0f;
-    bool hasCollided = false;
 };
 
 /**
@@ -87,16 +86,50 @@ class PhysicsManager : public core::DrawInterface
 {
 public:
     explicit PhysicsManager(core::EntityManager& entityManager);
+
+    /**
+     * @brief Applies gravtity to all Rigidbodies
+     * @param dt The delta time used to update
+    */
     void ApplyGravityToRigidbodies(sf::Time dt);
+    /**
+     * @brief Method to limit le player's movement to a defined box
+     * @param dt The delta time used to update
+    */
     void LimitPlayerMovement(sf::Time dt);
+    /**
+     * @brief Checks for collisions between circle colliders
+    */
     void CheckForCircleCollisions();
+    /**
+     * @brief The physical update
+     * @param dt The time used to update
+    */
     void FixedUpdate(sf::Time dt);
 
-    void SetRigidbody(core::Entity entity, const Rigidbody& rigidbody);
+    /**
+     * @brief Adds a rigidbody to an entity
+     * @param entity the entity to which we add a rigidbody
+    */
     void AddRigidbody(core::Entity entity);
+    /**
+     * @brief Sets an Entity's rigidboy to the given rigidbody
+     * @param entity The entity to set
+     * @param rigidbody The given rigidbody
+    */
+    void SetRigidbody(core::Entity entity, const Rigidbody& rigidbody);
     [[nodiscard]] const Rigidbody& GetRigidbody(core::Entity entity) const;
 
+    /**
+     * @brief Add a circle collider to and entity
+     * @param entity The entity to which we add a cirlce collider
+    */
     void AddCircle(core::Entity entity);
+    /**
+     * @brief Sets an Entity's circle collider to the given rigidbody
+     * @param entity The entity to set
+     * @param
+     */
     void SetCircle(core::Entity entity, const CircleCollider& sphere);
     [[nodiscard]] const CircleCollider& GetCircle(core::Entity entity) const;
 
@@ -105,12 +138,31 @@ public:
      * \param onTriggerInterface is the OnTriggerInterface to be called when a trigger occurs.
      */
     void RegisterTriggerListener(OnTriggerInterface& onTriggerInterface);
+    /**
+     * @brief Copies all the element of the physics manager
+     * @param physicsManager The physics manager to copy from
+    */
     void CopyAllComponents(const PhysicsManager& physicsManager);
+    /**
+     * @brief Draws the shapes of the physical elements
+     * @param renderTarget the target to render the shapes on
+    */
     void Draw(sf::RenderTarget& renderTarget) override;
     void SetCenter(sf::Vector2f center) { center_ = center; }
     void SetWindowSize(sf::Vector2f newWindowSize) { windowSize_ = newWindowSize; }
 
+    /**
+     * @brief Solves the collisions between two rigidbodies
+     * @param myBody The first rigidbody to evaluate
+     * @param otherBody The second rigidbody to evaluate
+    */
     static void SolveCollision(Rigidbody& myBody, Rigidbody& otherBody);
+    /**
+     * @brief Solves the position of two rigidbodies
+     * @param myBody The first rigidbody to evaluate
+     * @param otherBody The second rigidbody to evaluate
+     * @param mtv The minimum translation vector used to set rigidbodies positions
+    */
     static void SolveMTV(Rigidbody& myBody, Rigidbody& otherBody, const core::Vec2f& mtv);
 
     [[nodiscard]] core::Vec2f GetMTV() const { return mtv_; }

@@ -29,8 +29,16 @@ namespace game
 
         SoundManager(core::EntityManager& entityManager, GameManager& gameManager);
 
+        /**
+         * @brief Loads a sound to a given soundbuffer
+         * @param path The name of the sound in the folder (path)
+         * @param soundBuffer The buffer to load the sound in
+        */
         void LoadSound(std::string_view path, SoundBuffer& soundBuffer) const;
-
+        /**
+         * @brief Plays the sounds on entities
+         * @param entity the given entity to play sounds on
+        */
         void PlaySound(const core::Entity& entity);
         
         SoundBuffer catJumpSound;

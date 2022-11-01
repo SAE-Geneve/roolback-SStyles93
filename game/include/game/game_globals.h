@@ -39,17 +39,33 @@ namespace game
     constexpr float PLAYER_HEALTH = 100.0f;
     constexpr float PLAYER_SPEED = 5.0f;
     constexpr float PLAYER_JUMP_FORCE = 10.0f;
+    /**
+     * @brief The period at which the player can shoot bullets
+    */
     constexpr float PLAYER_SHOOTING_PERIOD = 0.5f;
+    /**
+     * @brief The speed at which the player charges his bullet
+    */
     constexpr float PLAYER_CHARGE_SPEED = 0.8f;
     constexpr float PLAYER_INVINCIBILITY_PERIOD = 1.5f;
     constexpr float INVINCIBILITY_FLASH_PERIOD = 0.5f;
+	/**
+	 * @brief The time after which the animation texture changes
+	*/
 	constexpr float ANIMATION_PERIOD = 0.25f;
     
     constexpr float BULLET_SPEED = 5.0f;
     constexpr float BULLET_SCALE = 2.0f;
     constexpr float BULLET_PERIOD = 3.0f;
     constexpr float BULLET_ROTATION_SPEED = 500.0f;
+    /**
+     * @brief The maximum power that a bullet can have
+    */
     constexpr float BULLET_MAX_POWER = 2.0f;
+    /**
+     * @brief The final power of the bullet on the player's life 
+     * @brief (ex: 4.0f == 4 bullets to kill 100% of player's life
+    */
     constexpr float BULLET_PER_LIFE_COEF = 4.0f;
     constexpr float BULLET_PUSH_POWER = 40.0f;
 
